@@ -1,0 +1,13 @@
+# Library load path para o homebrew em M1 Macs atualizado com base na sugestão
+# do aluno Matheus de Moraes Costa em 2022/2.
+
+./bin/macOS/main: src/*.cpp include/*.h
+	mkdir -p bin/macOS
+	g++ -std=c++11 -Wall -Wno-deprecated-declarations -Wno-unused-function -g -I ./include/ -o ./bin/macOS/main src/main.cpp src/glad.c src/textrendering.cpp src/tiny_obj_loader.cpp src/stb_image.cpp -framework OpenGL -L/usr/local/lib -L/opt/homebrew/Cellar -lglfw -lm -ldl -lpthread
+
+.PHONY: clean run
+clean:
+	rm -f bin/macOS/main
+
+run: ./bin/macOS/main
+	cd bin/macOS && ./main

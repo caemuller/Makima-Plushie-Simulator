@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Laboratorio_5" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/main" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Debug/" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/main" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Release/" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-std=c++11" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-static-libstdc++" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+				</Linker>
+			</Target>
+			<Target title="Linux">
+				<Option output="bin/Linux/main" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Linux/" />
+				<Option object_output="obj/Linux/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="lib-linux/libglfw3.a -lrt -lm -ldl -lX11 -lpthread -lXrandr -lXinerama -lXxf86vm -lXcursor" />
+				</Linker>
+			</Target>
+			<Target title="Debug (CBlocks 17.12 32-bit)">
+				<Option output="bin/Debug/main" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Debug/" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="lib-mingw-32\libglfw3.a -lgdi32 -lopengl32" />
+				</Linker>
+			</Target>
+			<Target title="Release (CBlocks 17.12 32-bit)">
+				<Option output="bin/Release/main" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Release/" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-std=c++11" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="lib-mingw-32\libglfw3.a -lgdi32 -lopengl32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-Wno-unused-function" />
+			<Add directory="include" />
+		</Compiler>
+		<Linker>
+			<Add option="lib\libglfw3.a -lgdi32 -lopengl32" />
+			<Add directory="lib" />
+		</Linker>
+		<Unit filename="include/GLFW/glfw3.h" />
+		<Unit filename="include/GLFW/glfw3native.h" />
+		<Unit filename="include/KHR/khrplatform.h" />
+		<Unit filename="include/dejavufont.h" />
+		<Unit filename="include/glad/glad.h" />
+		<Unit filename="include/glm/CMakeLists.txt" />
+		<Unit filename="include/glm/common.hpp" />
+		<Unit filename="include/glm/detail/_features.hpp" />
+		<Unit filename="include/glm/detail/_fixes.hpp" />
+		<Unit filename="include/glm/detail/_noise.hpp" />
+		<Unit filename="include/glm/detail/_swizzle.hpp" />
+		<Unit filename="include/glm/detail/_swizzle_func.hpp" />
+		<Unit filename="include/glm/detail/_vectorize.hpp" />
+		<Unit filename="include/glm/detail/func_common.hpp" />
+		<Unit filename="include/glm/detail/func_common.inl" />
+		<Unit filename="include/glm/detail/func_common_simd.inl" />
+		<Unit filename="include/glm/detail/func_exponential.hpp" />
+		<Unit filename="include/glm/detail/func_exponential.inl" />
+		<Unit filename="include/glm/detail/func_exponential_simd.inl" />
+		<Unit filename="include/glm/detail/func_geometric.hpp" />
+		<Unit filename="include/glm/detail/func_geometric.inl" />
+		<Unit filename="include/glm/detail/func_geometric_simd.inl" />
+		<Unit filename="include/glm/detail/func_integer.hpp" />
+		<Unit filename="include/glm/detail/func_integer.inl" />
+		<Unit filename="include/glm/detail/func_integer_simd.inl" />
+		<Unit filename="include/glm/detail/func_matrix.hpp" />
+		<Unit filename="include/glm/detail/func_matrix.inl" />
+		<Unit filename="include/glm/detail/func_matrix_simd.inl" />
+		<Unit filename="include/glm/detail/func_packing.hpp" />
+		<Unit filename="include/glm/detail/func_packing.inl" />
+		<Unit filename="include/glm/detail/func_packing_simd.inl" />
+		<Unit filename="include/glm/detail/func_trigonometric.hpp" />
+		<Unit filename="include/glm/detail/func_trigonometric.inl" />
+		<Unit filename="include/glm/detail/func_trigonometric_simd.inl" />
+		<Unit filename="include/glm/detail/func_vector_relational.hpp" />
+		<Unit filename="include/glm/detail/func_vector_relational.inl" />
+		<Unit filename="include/glm/detail/func_vector_relational_simd.inl" />
+		<Unit filename="include/glm/detail/precision.hpp" />
+		<Unit filename="include/glm/detail/setup.hpp" />
+		<Unit filename="include/glm/detail/type_float.hpp" />
+		<Unit filename="include/glm/detail/type_gentype.hpp" />
+		<Unit filename="include/glm/detail/type_gentype.inl" />
+		<Unit filename="include/glm/detail/type_half.hpp" />
+		<Unit filename="include/glm/detail/type_half.inl" />
+		<Unit filename="include/glm/detail/type_int.hpp" />
+		<Unit filename="include/glm/detail/type_mat.hpp" />
+		<Unit filename="include/glm/detail/type_mat.inl" />
+		<Unit filename="include/glm/detail/type_mat2x2.hpp" />
+		<Unit filename="include/glm/detail/type_mat2x2.inl" />
+		<Unit filename="include/glm/detail/type_mat2x3.hpp" />
+		<Unit filename="include/glm/detail/type_mat2x3.inl" />
+		<Unit filename="include/glm/detail/type_mat2x4.hpp" />
+		<Unit filename="include/glm/detail/type_mat2x4.inl" />
+		<Unit filename="include/glm/detail/type_mat3x2.hpp" />
+		<Unit filename="include/glm/detail/type_mat3x2.inl" />
+		<Unit filename="include/glm/detail/type_mat3x3.hpp" />
+		<Unit filename="include/glm/detail/type_mat3x3.inl" />
+		<Unit filename="include/glm/detail/type_mat3x4.hpp" />
+		<Unit filename="include/glm/detail/type_mat3x4.inl" />
+		<Unit filename="include/glm/detail/type_mat4x2.hpp" />
+		<Unit filename="include/glm/detail/type_mat4x2.inl" />
+		<Unit filename="include/glm/detail/type_mat4x3.hpp" />
+		<Unit filename="include/glm/detail/type_mat4x3.inl" />
+		<Unit filename="include/glm/detail/type_mat4x4.hpp" />
+		<Unit filename="include/glm/detail/type_mat4x4.inl" />
+		<Unit filename="include/glm/detail/type_mat4x4_simd.inl" />
+		<Unit filename="include/glm/detail/type_vec.hpp" />
+		<Unit filename="include/glm/detail/type_vec.inl" />
+		<Unit filename="include/glm/detail/type_vec1.hpp" />
+		<Unit filename="include/glm/detail/type_vec1.inl" />
+		<Unit filename="include/glm/detail/type_vec2.hpp" />
+		<Unit filename="include/glm/detail/type_vec2.inl" />
+		<Unit filename="include/glm/detail/type_vec3.hpp" />
+		<Unit filename="include/glm/detail/type_vec3.inl" />
+		<Unit filename="include/glm/detail/type_vec4.hpp" />
+		<Unit filename="include/glm/detail/type_vec4.inl" />
+		<Unit filename="include/glm/detail/type_vec4_simd.inl" />
+		<Unit filename="include/glm/exponential.hpp" />
+		<Unit filename="include/glm/ext.hpp" />
+		<Unit filename="include/glm/fwd.hpp" />
+		<Unit filename="include/glm/geometric.hpp" />
+		<Unit filename="include/glm/glm.hpp" />
+		<Unit filename="include/glm/gtc/bitfield.hpp" />
+		<Unit filename="include/glm/gtc/bitfield.inl" />
+		<Unit filename="include/glm/gtc/color_encoding.inl" />
+		<Unit filename="include/glm/gtc/color_space.hpp" />
+		<Unit filename="include/glm/gtc/color_space.inl" />
+		<Unit filename="include/glm/gtc/constants.hpp" />
+		<Unit filename="include/glm/gtc/constants.inl" />
+		<Unit filename="include/glm/gtc/epsilon.hpp" />
+		<Unit filename="include/glm/gtc/epsilon.inl" />
+		<Unit filename="include/glm/gtc/functions.hpp" />
+		<Unit filename="include/glm/gtc/functions.inl" />
+		<Unit filename="include/glm/gtc/integer.hpp" />
+		<Unit filename="include/glm/gtc/integer.inl" />
+		<Unit filename="include/glm/gtc/matrix_access.hpp" />
+		<Unit filename="include/glm/gtc/matrix_access.inl" />
+		<Unit filename="include/glm/gtc/matrix_integer.hpp" />
+		<Unit filename="include/glm/gtc/matrix_inverse.hpp" />
+		<Unit filename="include/glm/gtc/matrix_inverse.inl" />
+		<Unit filename="include/glm/gtc/matrix_transform.hpp" />
+		<Unit filename="include/glm/gtc/matrix_transform.inl" />
+		<Unit filename="include/glm/gtc/noise.hpp" />
+		<Unit filename="include/glm/gtc/noise.inl" />
+		<Unit filename="include/glm/gtc/packing.hpp" />
+		<Unit filename="include/glm/gtc/packing.inl" />
+		<Unit filename="include/glm/gtc/quaternion.hpp" />
+		<Unit filename="include/glm/gtc/quaternion.inl" />
+		<Unit filename="include/glm/gtc/quaternion_simd.inl" />
+		<Unit filename="include/glm/gtc/random.hpp" />
+		<Unit filename="include/glm/gtc/random.inl" />
+		<Unit filename="include/glm/gtc/reciprocal.hpp" />
+		<Unit filename="include/glm/gtc/reciprocal.inl" />
+		<Unit filename="include/glm/gtc/round.hpp" />
+		<Unit filename="include/glm/gtc/round.inl" />
+		<Unit filename="include/glm/gtc/type_aligned.hpp" />
+		<Unit filename="include/glm/gtc/type_precision.hpp" />
+		<Unit filename="include/glm/gtc/type_precision.inl" />
+		<Unit filename="include/glm/gtc/type_ptr.hpp" />
+		<Unit filename="include/glm/gtc/type_ptr.inl" />
+		<Unit filename="include/glm/gtc/ulp.hpp" />
+		<Unit filename="include/glm/gtc/ulp.inl" />
+		<Unit filename="include/glm/gtc/vec1.hpp" />
+		<Unit filename="include/glm/gtc/vec1.inl" />
+		<Unit filename="include/glm/gtx/associated_min_max.hpp" />
+		<Unit filename="include/glm/gtx/associated_min_max.inl" />
+		<Unit filename="include/glm/gtx/bit.hpp" />
+		<Unit filename="include/glm/gtx/bit.inl" />
+		<Unit filename="include/glm/gtx/closest_point.hpp" />
+		<Unit filename="include/glm/gtx/closest_point.inl" />
+		<Unit filename="include/glm/gtx/color_space.hpp" />
+		<Unit filename="include/glm/gtx/color_space.inl" />
+		<Unit filename="include/glm/gtx/color_space_YCoCg.hpp" />
+		<Unit filename="include/glm/gtx/color_space_YCoCg.inl" />
+		<Unit filename="include/glm/gtx/common.hpp" />
+		<Unit filename="include/glm/gtx/common.inl" />
+		<Unit filename="include/glm/gtx/compatibility.hpp" />
+		<Unit filename="include/glm/gtx/compatibility.inl" />
+		<Unit filename="include/glm/gtx/component_wise.hpp" />
+		<Unit filename="include/glm/gtx/component_wise.inl" />
+		<Unit filename="include/glm/gtx/dual_quaternion.hpp" />
+		<Unit filename="include/glm/gtx/dual_quaternion.inl" />
+		<Unit filename="include/glm/gtx/euler_angles.hpp" />
+		<Unit filename="include/glm/gtx/euler_angles.inl" />
+		<Unit filename="include/glm/gtx/extend.hpp" />
+		<Unit filename="include/glm/gtx/extend.inl" />
+		<Unit filename="include/glm/gtx/extended_min_max.hpp" />
+		<Unit filename="include/glm/gtx/extended_min_max.inl" />
+		<Unit filename="include/glm/gtx/fast_exponential.hpp" />
+		<Unit filename="include/glm/gtx/fast_exponential.inl" />
+		<Unit filename="include/glm/gtx/fast_square_root.hpp" />
+		<Unit filename="include/glm/gtx/fast_square_root.inl" />
+		<Unit filename="include/glm/gtx/fast_trigonometry.hpp" />
+		<Unit filename="include/glm/gtx/fast_trigonometry.inl" />
+		<Unit filename="include/glm/gtx/float_notmalize.inl" />
+		<Unit filename="include/glm/gtx/gradient_paint.hpp" />
+		<Unit filename="include/glm/gtx/gradient_paint.inl" />
+		<Unit filename="include/glm/gtx/handed_coordinate_space.hpp" />
+		<Unit filename="include/glm/gtx/handed_coordinate_space.inl" />
+		<Unit filename="include/glm/gtx/hash.hpp" />
+		<Unit filename="include/glm/gtx/hash.inl" />
+		<Unit filename="include/glm/gtx/integer.hpp" />
+		<Unit filename="include/glm/gtx/integer.inl" />
+		<Unit filename="include/glm/gtx/intersect.hpp" />
+		<Unit filename="include/glm/gtx/intersect.inl" />
+		<Unit filename="include/glm/gtx/io.hpp" />
+		<Unit filename="include/glm/gtx/io.inl" />
+		<Unit filename="include/glm/gtx/log_base.hpp" />
+		<Unit filename="include/glm/gtx/log_base.inl" />
+		<Unit filename="include/glm/gtx/matrix_cross_product.hpp" />
+		<Unit filename="include/glm/gtx/matrix_cross_product.inl" />
+		<Unit filename="include/glm/gtx/matrix_decompose.hpp" />
+		<Unit filename="include/glm/gtx/matrix_decompose.inl" />
+		<Unit filename="include/glm/gtx/matrix_interpolation.hpp" />
+		<Unit filename="include/glm/gtx/matrix_interpolation.inl" />
+		<Unit filename="include/glm/gtx/matrix_major_storage.hpp" />
+		<Unit filename="include/glm/gtx/matrix_major_storage.inl" />
+		<Unit filename="include/glm/gtx/matrix_operation.hpp" />
+		<Unit filename="include/glm/gtx/matrix_operation.inl" />
+		<Unit filename="include/glm/gtx/matrix_query.hpp" />
+		<Unit filename="include/glm/gtx/matrix_query.inl" />
+		<Unit filename="include/glm/gtx/matrix_transform_2d.hpp" />
+		<Unit filename="include/glm/gtx/matrix_transform_2d.inl" />
+		<Unit filename="include/glm/gtx/mixed_product.hpp" />
+		<Unit filename="include/glm/gtx/mixed_product.inl" />
+		<Unit filename="include/glm/gtx/norm.hpp" />
+		<Unit filename="include/glm/gtx/norm.inl" />
+		<Unit filename="include/glm/gtx/normal.hpp" />
+		<Unit filename="include/glm/gtx/normal.inl" />
+		<Unit filename="include/glm/gtx/normalize_dot.hpp" />
+		<Unit filename="include/glm/gtx/normalize_dot.inl" />
+		<Unit filename="include/glm/gtx/number_precision.hpp" />
+		<Unit filename="include/glm/gtx/number_precision.inl" />
+		<Unit filename="include/glm/gtx/optimum_pow.hpp" />
+		<Unit filename="include/glm/gtx/optimum_pow.inl" />
+		<Unit filename="include/glm/gtx/orthonormalize.hpp" />
+		<Unit filename="include/glm/gtx/orthonormalize.inl" />
+		<Unit filename="include/glm/gtx/perpendicular.hpp" />
+		<Unit filename="include/glm/gtx/perpendicular.inl" />
+		<Unit filename="include/glm/gtx/polar_coordinates.hpp" />
+		<Unit filename="include/glm/gtx/polar_coordinates.inl" />
+		<Unit filename="include/glm/gtx/projection.hpp" />
+		<Unit filename="include/glm/gtx/projection.inl" />
+		<Unit filename="include/glm/gtx/quaternion.hpp" />
+		<Unit filename="include/glm/gtx/quaternion.inl" />
+		<Unit filename="include/glm/gtx/range.hpp" />
+		<Unit filename="include/glm/gtx/raw_data.hpp" />
+		<Unit filename="include/glm/gtx/raw_data.inl" />
+		<Unit filename="include/glm/gtx/rotate_normalized_axis.hpp" />
+		<Unit filename="include/glm/gtx/rotate_normalized_axis.inl" />
+		<Unit filename="include/glm/gtx/rotate_vector.hpp" />
+		<Unit filename="include/glm/gtx/rotate_vector.inl" />
+		<Unit filename="include/glm/gtx/scalar_multiplication.hpp" />
+		<Unit filename="include/glm/gtx/scalar_relational.hpp" />
+		<Unit filename="include/glm/gtx/scalar_relational.inl" />
+		<Unit filename="include/glm/gtx/simd_mat4.hpp" />
+		<Unit filename="include/glm/gtx/simd_mat4.inl" />
+		<Unit filename="include/glm/gtx/simd_quat.hpp" />
+		<Unit filename="include/glm/gtx/simd_quat.inl" />
+		<Unit filename="include/glm/gtx/simd_vec4.hpp" />
+		<Unit filename="include/glm/gtx/simd_vec4.inl" />
+		<Unit filename="include/glm/gtx/spline.hpp" />
+		<Unit filename="include/glm/gtx/spline.inl" />
+		<Unit filename="include/glm/gtx/std_based_type.hpp" />
+		<Unit filename="include/glm/gtx/std_based_type.inl" />
+		<Unit filename="include/glm/gtx/string_cast.hpp" />
+		<Unit filename="include/glm/gtx/string_cast.inl" />
+		<Unit filename="include/glm/gtx/transform.hpp" />
+		<Unit filename="include/glm/gtx/transform.inl" />
+		<Unit filename="include/glm/gtx/transform2.hpp" />
+		<Unit filename="include/glm/gtx/transform2.inl" />
+		<Unit filename="include/glm/gtx/type_aligned.hpp" />
+		<Unit filename="include/glm/gtx/type_aligned.inl" />
+		<Unit filename="include/glm/gtx/type_trait.hpp" />
+		<Unit filename="include/glm/gtx/type_trait.inl" />
+		<Unit filename="include/glm/gtx/vector_angle.hpp" />
+		<Unit filename="include/glm/gtx/vector_angle.inl" />
+		<Unit filename="include/glm/gtx/vector_query.hpp" />
+		<Unit filename="include/glm/gtx/vector_query.inl" />
+		<Unit filename="include/glm/gtx/wrap.hpp" />
+		<Unit filename="include/glm/gtx/wrap.inl" />
+		<Unit filename="include/glm/integer.hpp" />
+		<Unit filename="include/glm/mat2x2.hpp" />
+		<Unit filename="include/glm/mat2x3.hpp" />
+		<Unit filename="include/glm/mat2x4.hpp" />
+		<Unit filename="include/glm/mat3x2.hpp" />
+		<Unit filename="include/glm/mat3x3.hpp" />
+		<Unit filename="include/glm/mat3x4.hpp" />
+		<Unit filename="include/glm/mat4x2.hpp" />
+		<Unit filename="include/glm/mat4x3.hpp" />
+		<Unit filename="include/glm/mat4x4.hpp" />
+		<Unit filename="include/glm/matrix.hpp" />
+		<Unit filename="include/glm/packing.hpp" />
+		<Unit filename="include/glm/simd/common.h" />
+		<Unit filename="include/glm/simd/exponential.h" />
+		<Unit filename="include/glm/simd/geometric.h" />
+		<Unit filename="include/glm/simd/integer.h" />
+		<Unit filename="include/glm/simd/matrix.h" />
+		<Unit filename="include/glm/simd/packing.h" />
+		<Unit filename="include/glm/simd/platform.h" />
+		<Unit filename="include/glm/simd/trigonometric.h" />
+		<Unit filename="include/glm/simd/vector_relational.h" />
+		<Unit filename="include/glm/trigonometric.hpp" />
+		<Unit filename="include/glm/vec2.hpp" />
+		<Unit filename="include/glm/vec3.hpp" />
+		<Unit filename="include/glm/vec4.hpp" />
+		<Unit filename="include/glm/vector_relational.hpp" />
+		<Unit filename="include/matrices.h" />
+		<Unit filename="include/stb_image.h" />
+		<Unit filename="include/tiny_obj_loader.h" />
+		<Unit filename="include/utils.h" />
+		<Unit filename="src/glad.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/main.cpp" />
+		<Unit filename="src/shader_fragment.glsl" />
+		<Unit filename="src/shader_vertex.glsl" />
+		<Unit filename="src/stb_image.cpp" />
+		<Unit filename="src/textrendering.cpp" />
+		<Unit filename="src/tiny_obj_loader.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
