@@ -308,10 +308,10 @@ int main(int argc, char* argv[])
     LoadShadersFromFiles();
 
     // Carregamos duas imagens para serem utilizadas como textura
-    LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");      // TextureImage0
-    LoadTextureImage("../../data/tc-earth_nightmap_citylights.gif"); // TextureImage1
-    LoadTextureImage("../../data/textures/rocky_trail_02_diff_4k.jpg");       // TextureImage2
-    LoadTextureImage("../../data/textures/rocky_trail_02_diff_4k.jpg");       // TextureImage3
+    LoadTextureImage("../../data/textures/salve.jpg");       // TextureImage0
+    LoadTextureImage("../../data/textures/salve.jpg");  // TextureImage1
+    LoadTextureImage("../../data/textures/salve.jpg");       // TextureImage2
+    LoadTextureImage("../../data/textures/salve.jpg");       // TextureImage3
 
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
@@ -470,6 +470,19 @@ int main(int argc, char* argv[])
         #define BUNNY  1
         #define PLANE  2
 
+        //desenah no infinito
+        model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
+              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
+        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, SPHERE);
+
+       
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        DrawVirtualObject("the_sphere");
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+
         // Desenhamos o modelo da esfera
         model = Matrix_Translate(-1.0f,0.0f,0.0f)
               * Matrix_Rotate_Z(0.6f)
@@ -491,6 +504,9 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
+
+        
+
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.
