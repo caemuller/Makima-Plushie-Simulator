@@ -98,7 +98,7 @@ void main()
         U = (theta + M_PI)/(2*M_PI);        
         V = (phi + (M_PI_2))/(M_PI);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
         
         
         
@@ -166,7 +166,7 @@ void main()
         U = (theta + M_PI)/(2*M_PI);        
         V = (phi + (M_PI_2))/(M_PI);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;        
+        Kd0 = texture(TextureImage0, vec2(U,V)).rgb;        
         
         
     }
