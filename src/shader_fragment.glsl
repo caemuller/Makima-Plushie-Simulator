@@ -22,6 +22,7 @@ uniform mat4 projection;
 #define SPHERE 0
 #define BUNNY  1
 #define PLANE  2
+#define SKYSPHERE 3
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -68,6 +69,7 @@ void main()
     // Coordenadas de textura U e V
     float U = 0.0;
     float V = 0.0;
+    vec3 Kd0 = vec3(0.0,0.0,0.0);
 
     if ( object_id == SPHERE )
     {
@@ -85,13 +87,21 @@ void main()
         //   variável position_model
 
         vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+        
+        vec4 p_l = bbox_center + 11* ((position_model - bbox_center)/(length(position_model - bbox_center)));
+        vec4 p_v = p_l - bbox_center;        
 
-        // Normalizamos as coordenadas de textura U e V para o intervalo [0,1]
-        U = (atan(position_model.x, position_model.z) + M_PI) / (2.0 * M_PI);
-        V = (asin(position_model.y) + M_PI_2) / M_PI;
-
-        // U = 0.0;
-        // V = 0.0;
+        
+        float theta = atan(p_v.x, p_v.z);
+        float phi = asin(p_v.y/11); 
+        
+        U = (theta + M_PI)/(2*M_PI);        
+        V = (phi + (M_PI_2))/(M_PI);
+        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
+        Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
+        
+        
+        
     }
     else if ( object_id == BUNNY )
     {
@@ -104,8 +114,6 @@ void main()
         // 'h' no slides 158-160 do documento Aula_20_Mapeamento_de_Texturas.pdf.
         // Veja também a Questão 4 do Questionário 4 no Moodle.
 
-
-
         float minx = bbox_min.x;
         float maxx = bbox_max.x;
 
@@ -115,30 +123,63 @@ void main()
         float minz = bbox_min.z;
         float maxz = bbox_max.z;
 
-        // Normalizamos as coordenadas de textura U e V para o intervalo [0,1]
-        U = (position_model.x - minx) / (maxx - minx);
-        V = (position_model.y - miny) / (maxy - miny);
+        float X = (position_model.x - bbox_min.x)/(bbox_max.x - bbox_min.x);
+        float Y = (position_model.y - bbox_min.y)/(bbox_max.y - bbox_min.y);
 
-                // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        vec3 Kd0 = texture(TextureImage3, vec2(U,V)).rgb;
-
-        // Equação de Iluminação
-        float lambert = max(0,dot(n,l));
-
-        color.rgb = Kd0 * (lambert + 0.01);
+        U = X;
+        V = Y;
+        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
+        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
     }
     else if ( object_id == PLANE )
     {
         // Coordenadas de textura do plano, obtidas do arquivo OBJ.
         U = texcoords.x;
         V = texcoords.y;
-            // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
+        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
+        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
+    }
+    else if ( object_id == SKYSPHERE )
+    {
+        // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
+        // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
+        // o slides 134-150 do documento Aula_20_Mapeamento_de_Texturas.pdf.
+        // A esfera que define a projeção deve estar centrada na posição
+        // "bbox_center" definida abaixo.
 
+        // Você deve utilizar:
+        //   função 'length( )' : comprimento Euclidiano de um vetor
+        //   função 'atan( , )' : arcotangente. Veja https://en.wikipedia.org/wiki/Atan2.
+        //   função 'asin( )'   : seno inverso.
+        //   constante M_PI
+        //   variável position_model
+
+        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+        
+        vec4 p_l = bbox_center + 11* ((position_model - bbox_center)/(length(position_model - bbox_center)));
+        vec4 p_v = p_l - bbox_center;        
+
+        
+        float theta = atan(p_v.x, p_v.z);
+        float phi = asin(p_v.y/11); 
+        
+        U = (theta + M_PI)/(2*M_PI);        
+        V = (phi + (M_PI_2))/(M_PI);
+        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
+        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;        
+        
+        
+    }
+
+    
+    
+    if(object_id == SKYSPHERE){
+        color.rgb = Kd0 ;
+    }
+    else{
         // Equação de Iluminação
         float lambert = max(0,dot(n,l));
-
-        color.rgb = Kd0 * (lambert + 0.01);
+        color.rgb = (Kd0 * (lambert + 0.01));
     }
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
@@ -158,38 +199,5 @@ void main()
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
     color.rgb = pow(color.rgb, vec3(1.0,1.0,1.0)/2.2);
-
-    if ( object_id == SPHERE )
-    {
-        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-
-        // Equação de Iluminação
-        float lambert = max(0,dot(n,l));
-        vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
-
-        // make TextureImage1 when it is dark
-        vec3 Kd1 = texture(TextureImage1, vec2(U,V)).rgb;
-
-        color.rgb = Kd0 * (lambert + 0.01) + Kd1 * (1.0 - lambert);
-
-        // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
-        // necessário:
-        // 1) Habilitar a operação de "blending" de OpenGL logo antes de realizar o
-        //    desenho dos objetos transparentes, com os comandos abaixo no código C++:
-        //      glEnable(GL_BLEND);
-        //      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        // 2) Realizar o desenho de todos objetos transparentes *após* ter desenhado
-        //    todos os objetos opacos; e
-        // 3) Realizar o desenho de objetos transparentes ordenados de acordo com
-        //    suas distâncias para a câmera (desenhando primeiro objetos
-        //    transparentes que estão mais longe da câmera).
-        // Alpha default = 1 = 100% opaco = 0% transparente
-        color.a = 1;
-
-        // Cor final com correção gamma, considerando monitor sRGB.
-        // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
-        color.rgb = pow(color.rgb, vec3(1.0,1.0,1.0)/2.2);
-    }
-
 } 
 

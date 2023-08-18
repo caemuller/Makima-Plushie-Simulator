@@ -308,10 +308,10 @@ int main(int argc, char* argv[])
     LoadShadersFromFiles();
 
     // Carregamos duas imagens para serem utilizadas como textura
-    LoadTextureImage("../../data/textures/salve.jpg");       // TextureImage0
-    LoadTextureImage("../../data/textures/salve.jpg");  // TextureImage1
-    LoadTextureImage("../../data/textures/salve.jpg");       // TextureImage2
-    LoadTextureImage("../../data/textures/salve.jpg");       // TextureImage3
+    LoadTextureImage("../../data/textures/mud_road_puresky_2k.hdr");       // TextureImage0
+    LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");  // TextureImage1
+    LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");       // TextureImage2
+    LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");       // TextureImage3
 
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
@@ -466,15 +466,17 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
         glUniformMatrix4fv(g_projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
+        // Desenhamos os objetos da cena virtual
         #define SPHERE 0
         #define BUNNY  1
         #define PLANE  2
+        #define SKYSPHERE 3
 
-        //desenah no infinito
+        //desenha no infinito
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
-              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
+              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.01f);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, SPHERE);
+        glUniform1i(g_object_id_uniform, SKYSPHERE);
 
        
         glDisable(GL_DEPTH_TEST);
@@ -500,7 +502,8 @@ int main(int argc, char* argv[])
         DrawVirtualObject("the_bunny");
 
         // Desenhamos o plano do chão
-        model = Matrix_Translate(0.0f,-1.1f,0.0f);
+        model = Matrix_Translate(0.0f,-1.1f,0.0f)
+                * Matrix_Scale(100.0f,0.1f,100.0f);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
