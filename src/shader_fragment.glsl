@@ -68,6 +68,15 @@ void main()
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
 
+    // Vetor que define o sentido da reflexão especular ideal.
+    // vec4 r = vec4(0.0,0.0,0.0,0.0); // PREENCHA AQUI o vetor de reflexão especular ideal
+    vec4 r = normalize(-l + 2 * n * dot(n, l));
+
+    vec3 Kd; // Refletância difusa
+    vec3 Ks; // Refletância especular
+    vec3 Ka; // Refletância ambiente
+    float q; // Expoente especular para o modelo de iluminação de Phong
+
     // Coordenadas de textura U e V
     float U = 0.0;
     float V = 0.0;
@@ -96,6 +105,10 @@ void main()
         
         float theta = atan(p_v.x, p_v.z);
         float phi = asin(p_v.y/11); 
+
+        Ks = vec3(0.0,0.0,0.0);
+        Ka = Kd0 / 2.0f;
+        q = 1.0;
         
         U = (theta + M_PI)/(2*M_PI);        
         V = (phi + (M_PI_2))/(M_PI);
@@ -128,18 +141,26 @@ void main()
         float X = (position_model.x - bbox_min.x)/(bbox_max.x - bbox_min.x);
         float Y = (position_model.y - bbox_min.y)/(bbox_max.y - bbox_min.y);
 
+        Ks = vec3(0.3,0.3,0.3);
+        Ka = vec3(0.0,0.0,0.0);
+        q = 20.0;
+
         U = X;
         V = Y;
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage3, vec2(U,V)).rgb;
+
     }
     else if ( object_id == PLANE )
     {
         // Coordenadas de textura do plano, obtidas do arquivo OBJ.
-        U = texcoords.x;
-        V = texcoords.y;
+        U = texcoords.x *100;
+        V = texcoords.y * 100;
+        // Kd = vec3(0.2,0.2,0.2);
+        Ks = vec3(0.3,0.3,0.3);
+        Ka = vec3(0.0,0.0,0.0);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage3, vec2(U,V)).rgb;
     }
     else if ( object_id == SKYSPHERE )
     {
@@ -173,6 +194,39 @@ void main()
         
     }
 
+
+   // Espectro da fonte de iluminação
+    vec3 I = vec3(100.0,100.0,1.0); // PREENCH AQUI o espectro da fonte de luz
+
+    // Espectro da luz ambiente
+    vec3 Ia = vec3(0.2,0.2,0.2); // PREENCHA AQUI o espectro da luz ambiente
+
+    // Termo difuso utilizando a lei dos cossenos de Lambert
+    vec3 lambert_diffuse_term = Kd * I * max(0, dot(n, l)); // PREENCHA AQUI o termo difuso de Lambert
+
+    // Termo ambiente
+    vec3 ambient_term = Ka * Ia; // PREENCHA AQUI o termo ambiente
+
+    // Termo especular utilizando o modelo de iluminação de Phong
+    vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // PREENCH AQUI o termo especular de Phong
+
+    // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
+    // necessário:
+    // 1) Habilitar a operação de "blending" de OpenGL logo antes de realizar o
+    //    desenho dos objetos transparentes, com os comandos abaixo no código C++:
+    //      glEnable(GL_BLEND);
+    //      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // 2) Realizar o desenho de todos objetos transparentes *após* ter desenhado
+    //    todos os objetos opacos; e
+    // 3) Realizar o desenho de objetos transparentes ordenados de acordo com
+    //    suas distâncias para a câmera (desenhando primeiro objetos
+    //    transparentes que estão mais longe da câmera).
+    // Alpha default = 1 = 100% opaco = 0% transparente
+    color.a = 1;
+
+    // Cor final do fragmento calculada com uma combinação dos termos difuso,
+    // especular, e ambiente. Veja slide 129 do documento Aula_17_e_18_Modelos_de_Iluminacao.pdf.
+    color.rgb = lambert_diffuse_term + ambient_term + phong_specular_term;
     
     
     if(object_id == SKYSPHERE){
@@ -180,8 +234,12 @@ void main()
     }
     else{
         // Equação de Iluminação
+        lambert_diffuse_term = Kd0 * I * max(0, dot(n, l));
+        vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q);
         float lambert = max(0,dot(n,l));
         color.rgb = (Kd0 * (lambert + 0.01));
+        // color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + phong_specular_term)*0.1;
+
     }
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
@@ -202,4 +260,3 @@ void main()
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
     color.rgb = pow(color.rgb, vec3(1.0,1.0,1.0)/2.2);
 } 
-

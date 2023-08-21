@@ -313,7 +313,7 @@ int main(int argc, char* argv[])
     // Carregamos duas imagens para serem utilizadas como textura
     LoadTextureImage("../../data/textures/mud_road_puresky_2k.hdr");       // TextureImage0
     LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");  // TextureImage1
-    LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");       // TextureImage2
+    LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
 
 
@@ -353,7 +353,7 @@ int main(int argc, char* argv[])
     float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
 
     glm::vec4 camera_position_c  = glm::vec4(3,3,3 ,1.0f);
-    float speed = 1.5f; // Velocidade da câmera
+    float speed = 2.5f; // Velocidade da câmera
     float prev_time = (float)glfwGetTime();
     
     camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
@@ -395,7 +395,7 @@ int main(int argc, char* argv[])
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
 
         if (toggle_V){
-            camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = last_cam_pos + glm::vec4(x,y,z,0.0f); // Ponto "c", centro da câmera
             camera_lookat_l    = last_cam_pos; // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
             camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
@@ -438,7 +438,7 @@ int main(int argc, char* argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -10.0f; // Posição do "far plane"
+        float farplane  = -100.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -501,7 +501,9 @@ int main(int argc, char* argv[])
         //create last cam posix
         // Desenhamos o modelo do coelho
         if(!toggle_V){
-            model = Matrix_Translate(camera_position_c.x+1,camera_position_c.y-0.8,camera_position_c.z+0.3);
+            model = Matrix_Translate(camera_position_c.x+1,camera_position_c.y-0.8,camera_position_c.z+0.3) * 
+            Matrix_Translate(-camera_view_vector.x, 0, -camera_view_vector.z);
+
             // make bunny move as cursor rotates
 
             last_cam_pos = camera_position_c;
@@ -514,7 +516,7 @@ int main(int argc, char* argv[])
 
         // Desenhamos o plano do chão
         model = Matrix_Translate(0.0f,-1.1f,0.0f)
-                * Matrix_Scale(100.0f,0.1f,100.0f);
+                * Matrix_Scale(100.0f,0.001f,100.0f);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
@@ -582,8 +584,8 @@ void LoadTextureImage(const char* filename)
     glGenSamplers(1, &sampler_id);
 
     // Veja slides 95-96 do documento Aula_20_Mapeamento_de_Texturas.pdf
-    glSamplerParameteri(sampler_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glSamplerParameteri(sampler_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glSamplerParameteri(sampler_id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glSamplerParameteri(sampler_id, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // Parâmetros de amostragem da textura.
     glSamplerParameteri(sampler_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -1693,4 +1695,3 @@ void PrintObjModelInfo(ObjModel* model)
 
 // set makeprg=cd\ ..\ &&\ make\ run\ >/dev/null
 // vim: set spell spelllang=pt_br :
-
