@@ -81,6 +81,7 @@ void main()
     float U = 0.0;
     float V = 0.0;
     vec3 Kd0 = vec3(0.0,0.0,0.0);
+    float epsilon = 0.0001;
 
     if ( object_id == SPHERE )
     {
@@ -103,13 +104,14 @@ void main()
         vec4 p_v = p_l - bbox_center;        
 
         
-        float theta = atan(p_v.x, p_v.z);
-        float phi = asin(p_v.y/11); 
+        float theta = atan(p_v.x, p_v.z) + epsilon;
+        float phi = asin(p_v.y/11) + epsilon;; 
 
         Ks = vec3(0.0,0.0,0.0);
         Ka = Kd0 / 2.0f;
         q = 1.0;
         
+
         U = (theta + M_PI)/(2*M_PI);        
         V = (phi + (M_PI_2))/(M_PI);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
@@ -183,8 +185,8 @@ void main()
         vec4 p_v = p_l - bbox_center;        
 
         
-        float theta = atan(p_v.x, p_v.z);
-        float phi = asin(p_v.y/11); 
+        float theta = atan(p_v.x, p_v.z) + epsilon;
+        float phi = asin(p_v.y/11) + epsilon; 
         
         U = (theta + M_PI)/(2*M_PI);        
         V = (phi + (M_PI_2))/(M_PI);
@@ -238,7 +240,7 @@ void main()
         vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q);
         float lambert = max(0,dot(n,l));
         color.rgb = (Kd0 * (lambert + 0.01));
-        // color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + phong_specular_term)*0.1;
+        // color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + phong_specular_term);
 
     }
 
