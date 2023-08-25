@@ -6,6 +6,7 @@
 // "shader_vertex.glsl" e "main.cpp".
 in vec4 position_world;
 in vec4 normal;
+in vec4 light_source;
 
 // Posição do vértice atual no sistema de coordenadas local do modelo.
 in vec4 position_model;
@@ -17,9 +18,6 @@ in vec2 texcoords;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-
-
-uniform mat4 moon_light;
 
 
 // Identificador que define qual objeto está sendo desenhado no momento
@@ -66,7 +64,8 @@ void main()
     vec4 n = normalize(normal);
 
     // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
-    vec4 l = vec4(0.0,0.0,0.0,0.0);
+    //vec4 l = normalize(vec4(11.0,10.0,111.0,0.0));
+    vec4 l = normalize(light_source - position_world);
 
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
@@ -110,8 +109,7 @@ void main()
         float theta = atan(p_v.x, p_v.z) + epsilon;
         float phi = asin(p_v.y/11) + epsilon;; 
 
-        Ks = vec3(0.0,0.0,0.0);
-        Ka = Kd0 / 2.0f;
+        Ks = vec3(0.2,0.2,0.2);
         q = 1.0;
         
 
@@ -119,6 +117,7 @@ void main()
         V = (phi + (M_PI_2))/(M_PI);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
         Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
+        Ka = Kd0 / 2.0f;
         
         
         
@@ -147,7 +146,7 @@ void main()
         float Y = (position_model.y - bbox_min.y)/(bbox_max.y - bbox_min.y);
 
         Ks = vec3(0.3,0.3,0.3);
-        Ka = vec3(0.0,0.0,0.0);
+        Ka = vec3(0.2,0.2,0.2);
         q = 20.0;
 
         U = X;
@@ -163,7 +162,7 @@ void main()
         V = texcoords.y * 100;
         // Kd = vec3(0.2,0.2,0.2);
         Ks = vec3(0.3,0.3,0.3);
-        Ka = vec3(0.0,0.0,0.0);
+        Ka = vec3(0.2,0.2,0.2);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
         Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
     }
@@ -191,7 +190,12 @@ void main()
         float theta = atan(p_v.x, p_v.z) + epsilon;
         float phi = asin(p_v.y/11) + epsilon; 
         
-        U = (theta + M_PI)/(2*M_PI);        
+        // U = (theta + M_PI)/(2*M_PI);
+
+        U = (theta < 0.0) ? (theta + 2.0 * M_PI) : theta;
+        U /= (2.0 * M_PI);
+
+
         V = (phi + (M_PI_2))/(M_PI);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
         Kd0 = texture(TextureImage0, vec2(U,V)).rgb;        
@@ -232,7 +236,7 @@ void main()
 
 
    // Espectro da fonte de iluminação
-    vec3 I = vec3(100.0,100.0,1.0); // PREENCH AQUI o espectro da fonte de luz
+    vec3 I = vec3(1.0,1.0,1.0); // PREENCH AQUI o espectro da fonte de luz
 
     // Espectro da luz ambiente
     vec3 Ia = vec3(0.2,0.2,0.2); // PREENCHA AQUI o espectro da luz ambiente
@@ -245,6 +249,10 @@ void main()
 
     // Termo especular utilizando o modelo de iluminação de Phong
     vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // PREENCH AQUI o termo especular de Phong
+
+    vec4 h = normalize(l + v);
+
+    vec3 blinn_phong_specular_term  = Ks * I * pow(max(0, dot(h, n)), q); // PREENCH AQUI o termo especular de Blinn-Phong
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
     // necessário:
@@ -278,9 +286,11 @@ void main()
         // Equação de Iluminação
         lambert_diffuse_term = Kd0 * I * max(0, dot(n, l));
         vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q);
+        vec3 blinn_phong_specular_term  = Ks * I * pow(max(0, dot(h, n)), q);
+
         float lambert = max(0,dot(n,l));
-        color.rgb = (Kd0 * (lambert + 0.01));
-        // color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + phong_specular_term);
+        // color.rgb = (Kd0 * (lambert + 0.01));
+        color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term);
 
     }
 
