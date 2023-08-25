@@ -313,7 +313,7 @@ int main(int argc, char* argv[])
     // Carregamos duas imagens para serem utilizadas como textura
     LoadTextureImage("../../data/textures/mud_road_puresky_2k.hdr");       // TextureImage0
     LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");  // TextureImage1
-    LoadTextureImage("../../data/textures/chess.png");       // TextureImage2
+    LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
 
 
@@ -419,14 +419,22 @@ int main(int argc, char* argv[])
             prev_time = current_time;
 
             // Realiza movimentação de objetos
-            if (tecla_D_pressionada)
-                camera_position_c += u * speed * delta_t;
-            if (tecla_A_pressionada)
-                camera_position_c -= u * speed * delta_t;
-            if (tecla_W_pressionada)
-                camera_position_c -= w * speed * delta_t;
-            if (tecla_S_pressionada)
-                camera_position_c += w * speed * delta_t;
+            if (tecla_D_pressionada){
+                camera_position_c.x += u.x * speed * delta_t;
+                camera_position_c.z += u.z * speed * delta_t;
+            }
+            if (tecla_A_pressionada){
+                camera_position_c.x -= u.x * speed * delta_t;
+                camera_position_c.z -= u.z * speed * delta_t;
+            }
+            if (tecla_W_pressionada){
+                camera_position_c.x -= w.x * speed * delta_t;
+                camera_position_c.z -= w.z * speed * delta_t;
+            }
+            if (tecla_S_pressionada){
+                camera_position_c.x += w.x * speed * delta_t;
+                camera_position_c.z += w.z * speed * delta_t;
+            }
         }
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
