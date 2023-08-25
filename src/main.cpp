@@ -225,6 +225,7 @@ bool g_ShowInfoText = true;
 // Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
 GLuint g_GpuProgramID = 0;
 GLint g_model_uniform;
+GLint g_moon_light_uniform;
 GLint g_view_uniform;
 GLint g_projection_uniform;
 GLint g_object_id_uniform;
@@ -492,11 +493,13 @@ int main(int argc, char* argv[])
 
         // Desenhamos o modelo da esfera
         float raio_lua = 100.0f;
+        float lua_escala = 5.0f;
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
-              * Matrix_Translate(raio_lua * sin((float)glfwGetTime() * 0.1),raio_lua * cos((float)glfwGetTime() * 0.1),0.0f)
+              * Matrix_Translate(raio_lua * cos((float)glfwGetTime() * 0.01),raio_lua * sin((float)glfwGetTime() * 0.01),0.0f)
               * Matrix_Rotate_Z(0.6f)
               * Matrix_Rotate_X(0.2f)
-              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
+              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f)
+              * Matrix_Scale(lua_escala, lua_escala, lua_escala);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, MOON);
         DrawVirtualObject("the_sphere");
@@ -701,7 +704,7 @@ void LoadShadersFromFiles()
     g_object_id_uniform  = glGetUniformLocation(g_GpuProgramID, "object_id"); // Variável "object_id" em shader_fragment.glsl
     g_bbox_min_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_min");
     g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");    
-   // g_moon_light_uniform   = glGetUniformLocation(g_GpuProgramID, "moon_light");
+    g_moon_light_uniform  = glGetUniformLocation(g_GpuProgramID, "moon_light");
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
