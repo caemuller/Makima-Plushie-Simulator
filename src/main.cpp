@@ -312,8 +312,8 @@ int main(int argc, char* argv[])
 
     // Carregamos duas imagens para serem utilizadas como textura
     LoadTextureImage("../../data/textures/mud_road_puresky_2k.hdr");       // TextureImage0
-    LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");  // TextureImage1
-    LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage2
+    LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");  // TextureImage1
+    LoadTextureImage("../../data/textures/chess.png");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
 
 
@@ -462,7 +462,6 @@ int main(int argc, char* argv[])
         }
 
         glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
-        glm::mat4 last_model = Matrix_Identity();
         // Enviamos as matrizes "view" e "projection" para a placa de vídeo
         // (GPU). Veja o arquivo "shader_vertex.glsl", onde estas são
         // efetivamente aplicadas em todos os pontos.
@@ -474,6 +473,8 @@ int main(int argc, char* argv[])
         #define BUNNY  1
         #define PLANE  2
         #define SKYSPHERE 3
+        #define MOON 4
+
 
         //desenha no infinito
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
@@ -485,10 +486,24 @@ int main(int argc, char* argv[])
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         DrawVirtualObject("the_sphere");
-        glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);         
         glEnable(GL_DEPTH_TEST);
 
+
         // Desenhamos o modelo da esfera
+        float raio_lua = 100.0f;
+        model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
+              * Matrix_Translate(raio_lua * sin((float)glfwGetTime() * 0.1),raio_lua * cos((float)glfwGetTime() * 0.1),0.0f)
+              * Matrix_Rotate_Z(0.6f)
+              * Matrix_Rotate_X(0.2f)
+              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
+        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, MOON);
+        DrawVirtualObject("the_sphere");
+         
+         glm::mat4 moon_light = model;
+
+         // Desenhamos o modelo da esfera
         model = Matrix_Translate(-1.0f,0.0f,0.0f)
               * Matrix_Rotate_Z(0.6f)
               * Matrix_Rotate_X(0.2f)
@@ -520,6 +535,8 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
+
+        
 
         
 
@@ -683,7 +700,8 @@ void LoadShadersFromFiles()
     g_projection_uniform = glGetUniformLocation(g_GpuProgramID, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
     g_object_id_uniform  = glGetUniformLocation(g_GpuProgramID, "object_id"); // Variável "object_id" em shader_fragment.glsl
     g_bbox_min_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_min");
-    g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");
+    g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");    
+   // g_moon_light_uniform   = glGetUniformLocation(g_GpuProgramID, "moon_light");
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
