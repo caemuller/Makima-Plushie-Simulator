@@ -16,5 +16,6 @@ Repo for our project :)
 - [x] Animações baseadas no tempo ($\Delta t$)   
 - [ ] Makima plushie                                     
 - [ ] Walls                                              
-- [ ] Enemies                                            
+- [ ] Enemies                       
+- [ ] Crosshair                     
 |-----------------------------------------------------

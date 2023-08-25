@@ -443,10 +443,6 @@ int main(int argc, char* argv[])
                 camera_position_c.z += w.z * speed * delta_t;
             }
 
-            if(toggle_1){
-                glBindVertexArray(vertex_array_object_id);
-                glDrawElements(GL_TRIANGLE_FAN, 18, GL_UNSIGNED_BYTE, 0);
-            }
 
         }
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
@@ -496,6 +492,18 @@ int main(int argc, char* argv[])
         #define SKYSPHERE 3
         #define MOON 4
 
+        if(toggle_1 && !toggle_V){
+            model = Matrix_Identity(); // Transformação identidade de modelagem
+            view = Matrix_Identity();
+            projection = Matrix_Identity();
+            glBindVertexArray(vertex_array_object_id);
+            glDisable(GL_DEPTH_TEST);
+            glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_BYTE, 0);
+            glEnable(GL_DEPTH_TEST);
+
+            // fix position of crosshair
+
+        }
 
         //desenha no infinito
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
@@ -755,26 +763,27 @@ void PopMatrix(glm::mat4& M)
 
 GLuint Build_crosshair(){
     
+    GLfloat NDC_coefficients[32*4];
     double pi = 3.14159265359;
+    float r1 = 0.3f;
+    float r2 = 0.5f;
+    float ang = 0.0f;
 
-    GLfloat NDC_coefficients[17*4];
-    for(int i=0;i<3;i++)
-        NDC_coefficients[i]=0.0f;
-    NDC_coefficients[3]=1.0f;
-
-    float x,y;
-    float r=0.7f;
-    float ang=0.0f;
-
-    for(int i=0;i<17;i++){
-        x=r*cos(ang);
-        y=r*sin(ang);
-        NDC_coefficients[i*4+4]=x;
-        NDC_coefficients[i*4+5]=y;
-        NDC_coefficients[i*4+6]=0.0f;
-        NDC_coefficients[i*4+7]=1.0f;
-        ang+=2*pi/16;
-    }
+    for(int i = 0; i < 16*4; i+=4){
+            NDC_coefficients[i] = 0.35*r1*cos(ang);
+            NDC_coefficients[i+1] = r1*sin(ang);
+            NDC_coefficients[i+2] = 0.0f;
+            NDC_coefficients[i+3] = 1.0f;
+            ang += pi/8;
+        }
+        ang=0.0f;
+        for(int i=16*4;i<32*4;i+=4){
+            NDC_coefficients[i] = 0.35*r2*cos(ang);
+            NDC_coefficients[i+1] = r2*sin(ang);
+            NDC_coefficients[i+2] = 0.0f;
+            NDC_coefficients[i+3] = 1.0f;
+            ang += pi/8;
+        }
 
     GLuint VBO_NDC_coefficients_id;
     glGenBuffers(1, &VBO_NDC_coefficients_id);
@@ -838,8 +847,8 @@ GLuint Build_crosshair(){
     // isto é: Vermelho, Verde, Azul, Alpha (valor de transparência).
     // Conversaremos sobre sistemas de cores nas aulas de Modelos de Iluminação.
 
-    GLfloat color_coefficients[17*4];
-    for(int i = 0; i < 17*4; i++)
+    GLfloat color_coefficients[32*4];
+    for(int i = 0; i < 32*4; i++)
         color_coefficients[i] = 1.0f;
 
     GLuint VBO_color_coefficients_id;
@@ -860,11 +869,20 @@ GLuint Build_crosshair(){
     //
     // Este vetor "indices" define a TOPOLOGIA (veja slides 103-110 do documento Aula_04_Modelagem_Geometrica_3D.pdf).
     //
- GLubyte indices[18]; // GLubyte: valores entre 0 e 255 (8 bits sem sinal).
-    for(int i = 0; i < 17; i++){
-        indices[i] = i;
-    }
-    indices[17] = 1;
+ GLubyte indices[34]; // GLubyte: valores entre 0 e 255 (8 bits sem sinal).
+ int cc=0;
+        for(int i=0; i<=32; i+=2){
+            indices[i] = cc;
+            cc++;
+        }
+        cc=16;
+        for(int i=1; i<32; i+=2){
+            indices[i] = cc;
+            cc++;
+        }
+
+        indices[32] = 0;
+        indices[33] = 16;
 
     GLuint indices_id;
     glGenBuffers(1, &indices_id);
