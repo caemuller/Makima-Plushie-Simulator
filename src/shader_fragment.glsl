@@ -110,7 +110,7 @@ void main()
         float theta = atan(p_v.x, p_v.z) + epsilon;
         float phi = asin(p_v.y/11) + epsilon;; 
 
-        Ks = vec3(0.0,0.0,0.0);
+        Ks = vec3(0.2,0.2,0.2);
         q = 1.0;
         
 
@@ -191,7 +191,12 @@ void main()
         float theta = atan(p_v.x, p_v.z) + epsilon;
         float phi = asin(p_v.y/11) + epsilon; 
         
-        U = (theta + M_PI)/(2*M_PI);        
+        // U = (theta + M_PI)/(2*M_PI);
+
+        U = (theta < 0.0) ? (theta + 2.0 * M_PI) : theta;
+        U /= (2.0 * M_PI);
+
+
         V = (phi + (M_PI_2))/(M_PI);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
         Kd0 = texture(TextureImage0, vec2(U,V)).rgb;        
