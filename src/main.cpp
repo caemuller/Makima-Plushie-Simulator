@@ -499,6 +499,8 @@ int main(int argc, char* argv[])
             glBindVertexArray(vertex_array_object_id);
             glDisable(GL_DEPTH_TEST);
             glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_BYTE, 0);
+            glBindVertexArray(0);
+
             glEnable(GL_DEPTH_TEST);
 
             // fix position of crosshair
