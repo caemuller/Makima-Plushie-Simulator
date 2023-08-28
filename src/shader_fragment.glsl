@@ -6,6 +6,7 @@
 // "shader_vertex.glsl" e "main.cpp".
 in vec4 position_world;
 in vec4 normal;
+in vec4 light_source;
 
 // Posição do vértice atual no sistema de coordenadas local do modelo.
 in vec4 position_model;
@@ -19,15 +20,13 @@ uniform mat4 view;
 uniform mat4 projection;
 
 
-//uniform mat4 moon_light = normalize(vec4(1.0,1.0,0.0,0.0));
-
-
 // Identificador que define qual objeto está sendo desenhado no momento
 #define SPHERE 0
 #define BUNNY  1
 #define PLANE  2
 #define SKYSPHERE 3
 #define MOON 4
+#define ENEMY 5
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -67,6 +66,7 @@ void main()
 
     // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
     vec4 l = normalize(vec4(11.0,10.0,111.0,0.0));
+    // vec4 l = normalize(light_source - position_world);
 
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
@@ -87,6 +87,43 @@ void main()
     float epsilon = 0.0001;
 
     if ( object_id == SPHERE )
+    {
+        // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
+        // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
+        // o slides 134-150 do documento Aula_20_Mapeamento_de_Texturas.pdf.
+        // A esfera que define a projeção deve estar centrada na posição
+        // "bbox_center" definida abaixo.
+
+        // Você deve utilizar:
+        //   função 'length( )' : comprimento Euclidiano de um vetor
+        //   função 'atan( , )' : arcotangente. Veja https://en.wikipedia.org/wiki/Atan2.
+        //   função 'asin( )'   : seno inverso.
+        //   constante M_PI
+        //   variável position_model
+
+        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+        
+        vec4 p_l = bbox_center + 11* ((position_model - bbox_center)/(length(position_model - bbox_center)));
+        vec4 p_v = p_l - bbox_center;        
+
+        
+        float theta = atan(p_v.x, p_v.z) + epsilon;
+        float phi = asin(p_v.y/11) + epsilon;; 
+
+        Ks = vec3(0.2,0.2,0.2);
+        q = 1.0;
+        
+
+        U = (theta + M_PI)/(2*M_PI);        
+        V = (phi + (M_PI_2))/(M_PI);
+        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
+        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
+        Ka = Kd0 / 2.0f;
+        
+        
+        
+    }
+    else if ( object_id == ENEMY )
     {
         // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
         // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência

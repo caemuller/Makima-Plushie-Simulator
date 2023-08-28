@@ -228,6 +228,7 @@ bool g_ShowInfoText = true;
 // Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
 GLuint g_GpuProgramID = 0;
 GLint g_model_uniform;
+GLint g_moon_light_uniform;
 GLint g_view_uniform;
 GLint g_projection_uniform;
 GLint g_object_id_uniform;
@@ -315,7 +316,7 @@ int main(int argc, char* argv[])
 
     // Carregamos duas imagens para serem utilizadas como textura
     LoadTextureImage("../../data/textures/mud_road_puresky_2k.hdr");       // TextureImage0
-    LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");  // TextureImage1
+    LoadTextureImage("../../data/textures/chess.png");  // TextureImage1
     LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
 
@@ -332,6 +333,10 @@ int main(int argc, char* argv[])
     ObjModel planemodel("../../data/plane.obj");
     ComputeNormals(&planemodel);
     BuildTrianglesAndAddToVirtualScene(&planemodel);
+
+    ObjModel enemymodel("../../data/Lowpoly_tree_sample.obj");
+    ComputeNormals(&enemymodel);
+    BuildTrianglesAndAddToVirtualScene(&enemymodel);
 
     if ( argc > 1 )
     {
@@ -455,7 +460,7 @@ int main(int argc, char* argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -100.0f; // Posição do "far plane"
+        float farplane  = -60.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -491,6 +496,7 @@ int main(int argc, char* argv[])
         #define PLANE  2
         #define SKYSPHERE 3
         #define MOON 4
+        #define ENEMY 5   
 
         if(toggle_1 && !toggle_V){
             model = Matrix_Identity(); // Transformação identidade de modelagem
@@ -519,20 +525,38 @@ int main(int argc, char* argv[])
         DrawVirtualObject("the_sphere");
         glEnable(GL_CULL_FACE);         
         glEnable(GL_DEPTH_TEST);
+        
+
+         if(toggle_1 && !toggle_V){
+            model = Matrix_Identity(); // Transformação identidade de modelagem
+            view = Matrix_Identity();
+            projection = Matrix_Identity();
+            glBindVertexArray(vertex_array_object_id);
+            glDisable(GL_DEPTH_TEST);
+            glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_BYTE, 0);
+            glEnable(GL_DEPTH_TEST);
+
+            // fix position of crosshair
+
+        }
 
 
         // Desenhamos o modelo da esfera
-        float raio_lua = 100.0f;
+        float raio_lua = abs(farplane);
+        float lua_escala = 5.0f;
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
-              * Matrix_Translate(raio_lua * sin((float)glfwGetTime() * 0.1),raio_lua * cos((float)glfwGetTime() * 0.1),0.0f)
+              * Matrix_Translate(raio_lua * cos((float)glfwGetTime() * 0.01),raio_lua * sin((float)glfwGetTime() * 0.01),0.0f)
               * Matrix_Rotate_Z(0.6f)
               * Matrix_Rotate_X(0.2f)
-              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
+              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.01f)
+              * Matrix_Scale(lua_escala, lua_escala, lua_escala);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, MOON);
         DrawVirtualObject("the_sphere");
          
-         glm::mat4 moon_light = model;
+    
+        glm::mat4 moon_light = model;
+        glUniformMatrix4fv(g_moon_light_uniform , 1 , GL_FALSE , glm::value_ptr(moon_light));
 
          // Desenhamos o modelo da esfera
         model = Matrix_Translate(-1.0f,0.0f,0.0f)
@@ -542,6 +566,32 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
+
+
+         // Desenhamos o modelo do inimigo
+         for(int i = 0; i < 3; i++){
+            for(int l = 0; l < 3; l++){
+                srand((unsigned)(i+l));
+                int rand_x = rand() % 10;
+                int rand_z = rand() % 10;
+
+                if (toggle_E)
+                {
+                    model = Matrix_Translate(-30.0f + i*15.0f + rand_x,-1.1f,-10.0f + l*15.0f - rand_z)
+                          * Matrix_Scale(1.0f,0.1f + (rand() % 10 )/100000 ,1.0f);              
+                }
+                else
+                {                    
+                    model = Matrix_Translate(-30.0f + i*15.0f + rand_x,-1.1f,-10.0f + l*15.0f - rand_z);   
+                }
+
+                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(g_object_id_uniform, ENEMY);
+                DrawVirtualObject("tree_bark");
+                DrawVirtualObject("tree_leaf");
+            }
+         }
+       
 
 
         //create last cam posix
@@ -732,7 +782,7 @@ void LoadShadersFromFiles()
     g_object_id_uniform  = glGetUniformLocation(g_GpuProgramID, "object_id"); // Variável "object_id" em shader_fragment.glsl
     g_bbox_min_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_min");
     g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");    
-   // g_moon_light_uniform   = glGetUniformLocation(g_GpuProgramID, "moon_light");
+    g_moon_light_uniform  = glGetUniformLocation(g_GpuProgramID, "moon_light");
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
