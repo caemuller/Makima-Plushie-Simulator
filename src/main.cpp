@@ -373,8 +373,7 @@ int main(int argc, char* argv[])
     glm::vec4 last_cam_pos = camera_position_c;
     
     bool smash = false;
-    int smash_y = 1.0f;
-    int smash_x = 0.0f;
+    float smash_y = 1.0f;
     //iniloop
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -399,9 +398,9 @@ int main(int argc, char* argv[])
 
         //variação de tempo
         
-            float current_time = (float)glfwGetTime();
-            float delta_t = current_time - prev_time;
-            prev_time = current_time;
+        float current_time = (float)glfwGetTime();
+        float delta_t = current_time - prev_time;
+        prev_time = current_time;
 
         // Computamos a posição da câmera utilizando coordenadas esféricas.  As
         // variáveis g_CameraDistance, g_CameraPhi, e g_CameraTheta são
@@ -563,22 +562,17 @@ int main(int argc, char* argv[])
 
         
 
-        if (toggle_2)
+        if (toggle_E)
         {        
             smash = true;
         }
         else{
             smash  = false;
             smash_y = 1.0f;
-            smash_x = 0.0f;
         }
 
         if(smash && (smash_y < 40.0f)){
             smash_y += delta_t *80;
-        }
-
-        if(smash && (smash_x < 40.0f)){
-            smash_x += delta_t *80;
         }
 
          // Desenhamos o modelo do inimigo
@@ -591,8 +585,7 @@ int main(int argc, char* argv[])
 
                 
                 model = Matrix_Translate(-100.0f + i*15.0f + rand_x,-1.1f,-100.0f + l*15.0f - rand_z)
-                        * Matrix_Scale(0.5f,0.5f/ smash_y,0.5f)
-                        * Matrix_Rotate_X(smash_x); 
+                        * Matrix_Scale(0.5f,0.5f/ smash_y,0.5f); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, ENEMY);
