@@ -334,6 +334,10 @@ int main(int argc, char* argv[])
     ComputeNormals(&planemodel);
     BuildTrianglesAndAddToVirtualScene(&planemodel);
 
+    ObjModel enemymodel("../../data/Lowpoly_tree_sample.obj");
+    ComputeNormals(&enemymodel);
+    BuildTrianglesAndAddToVirtualScene(&enemymodel);
+
     if ( argc > 1 )
     {
         ObjModel model(argv[1]);
@@ -491,20 +495,8 @@ int main(int argc, char* argv[])
         #define BUNNY  1
         #define PLANE  2
         #define SKYSPHERE 3
-        #define MOON 4
-
-        if(toggle_1 && !toggle_V){
-            model = Matrix_Identity(); // Transformação identidade de modelagem
-            view = Matrix_Identity();
-            projection = Matrix_Identity();
-            glBindVertexArray(vertex_array_object_id);
-            glDisable(GL_DEPTH_TEST);
-            glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_BYTE, 0);
-            glEnable(GL_DEPTH_TEST);
-
-            // fix position of crosshair
-
-        }
+        #define MOON 4    
+        #define ENEMY 5   
 
         //desenha no infinito
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
@@ -518,6 +510,20 @@ int main(int argc, char* argv[])
         DrawVirtualObject("the_sphere");
         glEnable(GL_CULL_FACE);         
         glEnable(GL_DEPTH_TEST);
+        
+
+         if(toggle_1 && !toggle_V){
+            model = Matrix_Identity(); // Transformação identidade de modelagem
+            view = Matrix_Identity();
+            projection = Matrix_Identity();
+            glBindVertexArray(vertex_array_object_id);
+            glDisable(GL_DEPTH_TEST);
+            glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_BYTE, 0);
+            glEnable(GL_DEPTH_TEST);
+
+            // fix position of crosshair
+
+        }
 
 
         // Desenhamos o modelo da esfera
@@ -545,6 +551,32 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
+
+
+         // Desenhamos o modelo do inimigo
+         for(int i = 0; i < 30; i++){
+            for(int l = 0; l < 30; l++){
+                srand((unsigned)(i+l));
+                int rand_x = rand() % 10;
+                int rand_z = rand() % 10;
+
+                if (g_LeftMouseButtonPressed && )
+                {
+                    model = Matrix_Translate(-100.0f + i*15.0f + rand_x,-1.1f,-100.0f + l*15.0f - rand_z)
+                          * Matrix_Scale(1.0f,0.1f + (rand() % 10 )/10 ,1.0f);              
+                }
+                else
+                {                    
+                    model = Matrix_Translate(-100.0f + i*15.0f + rand_x,-1.1f,-100.0f + l*15.0f - rand_z);   
+                }
+
+                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(g_object_id_uniform, ENEMY);
+                DrawVirtualObject("tree_bark");
+                DrawVirtualObject("tree_leaf");
+            }
+         }
+       
 
 
         //create last cam posix
