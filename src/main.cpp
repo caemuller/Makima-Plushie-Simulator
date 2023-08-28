@@ -238,6 +238,8 @@ GLint g_bbox_max_uniform;
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
 
+
+
 int main(int argc, char* argv[])
 {
     // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
@@ -559,20 +561,23 @@ int main(int argc, char* argv[])
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
 
-
         
-
+        int smash_speed = 10;
+        //smash on
         if (toggle_E)
         {        
             smash = true;
+            toggle_E = !toggle_E;
         }
+        //smash
+        if(smash && (smash_y < 40.0f))
+        {
+            smash_y += delta_t * smash_speed;
+        }
+        //fim smash
         else{
-            smash  = false;
-            smash_y = 1.0f;
-        }
-
-        if(smash && (smash_y < 40.0f)){
-            smash_y += delta_t *80;
+            smash = false;
+            smash_y = 1.0f;         
         }
 
          // Desenhamos o modelo do inimigo
@@ -580,15 +585,13 @@ int main(int argc, char* argv[])
             for(int l = 0; l < 3; l++){
                 srand((unsigned)(i+l));
                 int rand_x = rand() % 10;
-                int rand_z = rand() % 10;
+                int rand_z = rand() % 10;   
                 
-
-                
-                model = Matrix_Translate(-100.0f + i*15.0f + rand_x,-1.1f,-100.0f + l*15.0f - rand_z)
-                        * Matrix_Scale(0.5f,0.5f/ smash_y,0.5f); 
+                model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0))
+                      * Matrix_Scale(0.5f,0.5f/smash_y,0.5f); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-                glUniform1i(g_object_id_uniform, ENEMY);
+                glUniform1i(g_object_id_uniform, SPHERE);
                 DrawVirtualObject("tree_bark");
                 DrawVirtualObject("tree_leaf");
             }
