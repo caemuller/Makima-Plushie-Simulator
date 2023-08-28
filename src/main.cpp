@@ -219,6 +219,9 @@ float g_ForearmAngleX = 0.0f;
 float g_TorsoPositionX = 0.0f;
 float g_TorsoPositionY = 0.0f;
 
+// variavel para flatline
+float flatline_coefficient = 1.0f;
+
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
 
@@ -497,21 +500,9 @@ int main(int argc, char* argv[])
         #define SKYSPHERE 3
         #define MOON 4
         #define ENEMY 5   
+        #define CROSSHAIR 6
 
-        if(toggle_1 && !toggle_V){
-            model = Matrix_Identity(); // Transformação identidade de modelagem
-            view = Matrix_Identity();
-            projection = Matrix_Identity();
-            glBindVertexArray(vertex_array_object_id);
-            glDisable(GL_DEPTH_TEST);
-            glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_BYTE, 0);
-            glBindVertexArray(0);
 
-            glEnable(GL_DEPTH_TEST);
-
-            // fix position of crosshair
-
-        }
 
         //desenha no infinito
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
@@ -528,16 +519,47 @@ int main(int argc, char* argv[])
         
 
          if(toggle_1 && !toggle_V){
-            model = Matrix_Identity(); // Transformação identidade de modelagem
-            view = Matrix_Identity();
-            projection = Matrix_Identity();
+
+            // neste trecho de codigo foi utilizada ajuda do chatGPT
+            // embora ele tenha ajudado os outputs do modelo sempre
+            // continham diversos erros e foi necessário fazer diversas
+            // alterações para que o codigo funcionasse corretamente
+            const float crosshairSize = 0.1f; // Adjust as needed
+
+            // Calculate the crosshair's position (fixed in front of the camera)
+            glm::vec4 crosshairPosition = camera_position_c + camera_view_vector * 0.2f;
+
+            // Calculate the vector from the crosshair to the camera
+            glm::vec4 viewDirection = (camera_position_c - crosshairPosition) / norm(camera_position_c - crosshairPosition);
+
+            // Calculate the right vector (perpendicular to the view direction and world up)
+            glm::vec4 world_up = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+            glm::vec4 right = crossproduct(world_up, viewDirection);
+
+            // Calculate the up vector based on the right and view direction
+            glm::vec4 up = crossproduct(viewDirection, right);
+
+            // Create the rotation matrix using the calculated right, up, and view direction
+            glm::mat4 crosshairRotation(1.0f);
+            crosshairRotation[0] = glm::vec4(right);
+            crosshairRotation[1] = glm::vec4(up);
+            crosshairRotation[2] = glm::vec4(viewDirection);
+
+            // Calculate the scaling matrix for the crosshair (uniform scaling)
+            glm::mat4 crosshairScale = Matrix_Scale(crosshairSize, crosshairSize, crosshairSize);
+
+            // Assuming you have a translate matrix function Matrix_Translate()
+            glm::mat4 crosshairTranslation = Matrix_Translate(crosshairPosition.x, crosshairPosition.y, crosshairPosition.z);
+
+            // Combine the translation, rotation, and scale matrices
+            glm::mat4 crosshairModel = crosshairTranslation * crosshairRotation * crosshairScale;
+
+            // Set the crosshair model matrix uniform and draw it
+            glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(crosshairModel));
+
             glBindVertexArray(vertex_array_object_id);
-            glDisable(GL_DEPTH_TEST);
             glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_BYTE, 0);
-            glEnable(GL_DEPTH_TEST);
-
-            // fix position of crosshair
-
+            glBindVertexArray(0);
         }
 
 
