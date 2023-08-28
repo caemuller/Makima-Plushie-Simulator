@@ -316,7 +316,7 @@ int main(int argc, char* argv[])
 
     // Carregamos duas imagens para serem utilizadas como textura
     LoadTextureImage("../../data/textures/mud_road_puresky_2k.hdr");       // TextureImage0
-    LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");  // TextureImage1
+    LoadTextureImage("../../data/textures/chess.png");  // TextureImage1
     LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
 
@@ -374,6 +374,7 @@ int main(int argc, char* argv[])
     
     bool smash = false;
     int smash_y = 1.0f;
+    int smash_x = 0.0f;
     //iniloop
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -467,7 +468,7 @@ int main(int argc, char* argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -100.0f; // Posição do "far plane"
+        float farplane  = -60.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -569,15 +570,20 @@ int main(int argc, char* argv[])
         else{
             smash  = false;
             smash_y = 1.0f;
+            smash_x = 0.0f;
         }
 
         if(smash && (smash_y < 40.0f)){
             smash_y += delta_t *80;
         }
 
+        if(smash && (smash_x < 40.0f)){
+            smash_x += delta_t *80;
+        }
+
          // Desenhamos o modelo do inimigo
-         for(int i = 0; i < 30; i++){
-            for(int l = 0; l < 30; l++){
+         for(int i = 0; i < 3; i++){
+            for(int l = 0; l < 3; l++){
                 srand((unsigned)(i+l));
                 int rand_x = rand() % 10;
                 int rand_z = rand() % 10;
@@ -585,7 +591,8 @@ int main(int argc, char* argv[])
 
                 
                 model = Matrix_Translate(-100.0f + i*15.0f + rand_x,-1.1f,-100.0f + l*15.0f - rand_z)
-                        * Matrix_Scale(0.5f,0.5f/ smash_y,0.5f); 
+                        * Matrix_Scale(0.5f,0.5f/ smash_y,0.5f)
+                        * Matrix_Rotate_X(smash_x); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, ENEMY);
