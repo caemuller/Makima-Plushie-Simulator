@@ -371,6 +371,10 @@ int main(int argc, char* argv[])
     glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
     glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f);
     glm::vec4 last_cam_pos = camera_position_c;
+    
+    bool smash = false;
+    int smash_y = 1.0f;
+    //iniloop
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
@@ -391,6 +395,12 @@ int main(int argc, char* argv[])
         // Pedimos para a GPU utilizar o programa de GPU criado acima (contendo
         // os shaders de vértice e fragmentos).
         glUseProgram(g_GpuProgramID);
+
+        //variação de tempo
+        
+            float current_time = (float)glfwGetTime();
+            float delta_t = current_time - prev_time;
+            prev_time = current_time;
 
         // Computamos a posição da câmera utilizando coordenadas esféricas.  As
         // variáveis g_CameraDistance, g_CameraPhi, e g_CameraTheta são
@@ -426,9 +436,6 @@ int main(int argc, char* argv[])
             w = w / norm(w);
             u = u / norm(u);
 
-            float current_time = (float)glfwGetTime();
-            float delta_t = current_time - prev_time;
-            prev_time = current_time;
 
             // Realiza movimentação de objetos
             if (tecla_D_pressionada){
@@ -553,22 +560,32 @@ int main(int argc, char* argv[])
         DrawVirtualObject("the_sphere");
 
 
+        
+
+        if (toggle_2)
+        {        
+            smash = true;
+        }
+        else{
+            smash  = false;
+            smash_y = 1.0f;
+        }
+
+        if(smash && (smash_y < 40.0f)){
+            smash_y += delta_t *80;
+        }
+
          // Desenhamos o modelo do inimigo
          for(int i = 0; i < 30; i++){
             for(int l = 0; l < 30; l++){
                 srand((unsigned)(i+l));
                 int rand_x = rand() % 10;
                 int rand_z = rand() % 10;
+                
 
-                if (g_LeftMouseButtonPressed && )
-                {
-                    model = Matrix_Translate(-100.0f + i*15.0f + rand_x,-1.1f,-100.0f + l*15.0f - rand_z)
-                          * Matrix_Scale(1.0f,0.1f + (rand() % 10 )/10 ,1.0f);              
-                }
-                else
-                {                    
-                    model = Matrix_Translate(-100.0f + i*15.0f + rand_x,-1.1f,-100.0f + l*15.0f - rand_z);   
-                }
+                
+                model = Matrix_Translate(-100.0f + i*15.0f + rand_x,-1.1f,-100.0f + l*15.0f - rand_z)
+                        * Matrix_Scale(0.5f,0.5f/ smash_y,0.5f); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, ENEMY);
