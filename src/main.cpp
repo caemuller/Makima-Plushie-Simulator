@@ -553,7 +553,7 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_moon_light_uniform , 1 , GL_FALSE , glm::value_ptr(moon_light));
 
          // Desenhamos o modelo da esfera
-        model = Matrix_Translate(-1.0f,0.0f,0.0f)
+        model = Matrix_Translate(-1.0f,2.0f,0.0f)
               * Matrix_Rotate_Z(0.6f)
               * Matrix_Rotate_X(0.2f)
               * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
@@ -579,6 +579,7 @@ int main(int argc, char* argv[])
             smash = false;
             smash_y = 1.0f;         
         }
+        intersection_hitsphere(camera_position_c, camera_view_vector, vec4(model[3][0],model[3][1],model[3][2],1.0f));
 
          // Desenhamos o modelo do inimigo
          for(int i = 0; i < 3; i++){
