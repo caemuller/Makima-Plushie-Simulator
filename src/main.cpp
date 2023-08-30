@@ -325,6 +325,8 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/textures/chess.png");  // TextureImage1
     LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
+    LoadTextureImage("../../data/textures/camo-green.jpg");
+    LoadTextureImage("../../data/textures/camobrown.jpg");
 
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
@@ -569,7 +571,9 @@ int main(int argc, char* argv[])
             glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(crosshairModel));
 
             glBindVertexArray(vertex_array_object_id);
+            glDepthFunc(GL_ALWAYS);
             glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_BYTE, 0);
+            glDepthFunc(GL_LESS);
             glBindVertexArray(0);
         }
 
@@ -653,7 +657,7 @@ int main(int argc, char* argv[])
                       * Matrix_Scale(0.5f,0.5f/smash_y,0.5f); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-                glUniform1i(g_object_id_uniform, SPHERE);
+                glUniform1i(g_object_id_uniform, ENEMY);
                 DrawVirtualObject("tree_bark");
                 DrawVirtualObject("tree_leaf");
             }
@@ -857,6 +861,8 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage1"), 1);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage2"), 2);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage3"), 3);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_green"), 4);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_brown"), 5);
     glUseProgram(0);
 }
 
@@ -884,12 +890,12 @@ GLuint Build_crosshair(){
     
     GLfloat NDC_coefficients[32*4];
     double pi = 3.14159265359;
-    float r1 = 0.3f;
-    float r2 = 0.5f;
+    float r1 = 0.1f;
+    float r2 = 0.15f;
     float ang = 0.0f;
 
     for(int i = 0; i < 16*4; i+=4){
-            NDC_coefficients[i] = 0.35*r1*cos(ang);
+            NDC_coefficients[i] = r1*cos(ang);
             NDC_coefficients[i+1] = r1*sin(ang);
             NDC_coefficients[i+2] = 0.0f;
             NDC_coefficients[i+3] = 1.0f;
@@ -897,7 +903,7 @@ GLuint Build_crosshair(){
         }
         ang=0.0f;
         for(int i=16*4;i<32*4;i+=4){
-            NDC_coefficients[i] = 0.35*r2*cos(ang);
+            NDC_coefficients[i] = r2*cos(ang);
             NDC_coefficients[i+1] = r2*sin(ang);
             NDC_coefficients[i+2] = 0.0f;
             NDC_coefficients[i+3] = 1.0f;
@@ -968,7 +974,7 @@ GLuint Build_crosshair(){
 
     GLfloat color_coefficients[32*4];
     for(int i = 0; i < 32*4; i++)
-        color_coefficients[i] = 1.0f;
+        color_coefficients[i] = 0.9f;
 
     GLuint VBO_color_coefficients_id;
     glGenBuffers(1, &VBO_color_coefficients_id);
