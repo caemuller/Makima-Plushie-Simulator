@@ -17,5 +17,6 @@ Repo for our project :)
 - [ ] Makima plushie   (soon I hope :sunglasses:)                                  
 - [ ] Walls                                              
 - [ ] Enemies                       
-- [ ] Crosshair                     
+- [ ] Crosshair                 
+- [x] Trees    
 |-----------------------------------------------------
