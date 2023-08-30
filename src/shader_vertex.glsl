@@ -10,14 +10,13 @@ layout (location = 2) in vec2 texture_coefficients;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform mat4 moon_light;
+uniform mat4 light_source;
 
 // Atributos de vértice que serão gerados como saída ("out") pelo Vertex Shader.
 // ** Estes serão interpolados pelo rasterizador! ** gerando, assim, valores
 // para cada fragmento, os quais serão recebidos como entrada pelo Fragment
 // Shader. Veja o arquivo "shader_fragment.glsl".
 out vec4 position_world;
-out vec4 light_source;
 out vec4 position_model;
 out vec4 normal;
 out vec2 texcoords;
@@ -62,12 +61,6 @@ void main()
     // Veja slides 123-151 do documento Aula_07_Transformacoes_Geometricas_3D.pdf.
     normal = inverse(transpose(model)) * normal_coefficients;
     normal.w = 0.0;
-
-    //moon light 
-    if(determinant(moon_light) != 0.0)
-        light_source = vec4(11.0,100.0,11.0,0.0);
-    else
-        light_source = vec4(vec4(0.0,0.0,0.0,1.0) * moon_light);
 
     // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
     texcoords = texture_coefficients;

@@ -232,7 +232,7 @@ bool g_ShowInfoText = true;
 // Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
 GLuint g_GpuProgramID = 0;
 GLint g_model_uniform;
-GLint g_moon_light_uniform;
+GLint g_light_source_uniform;
 GLint g_view_uniform;
 GLint g_projection_uniform;
 GLint g_object_id_uniform;
@@ -380,6 +380,7 @@ int main(int argc, char* argv[])
     
     bool smash = false;
     float smash_y = 1.0f;
+    float spline_t = 0.0f;
     //iniloop
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -587,11 +588,33 @@ int main(int argc, char* argv[])
         DrawVirtualObject("the_sphere");
          
     
-        glm::mat4 moon_light = model;
-        glUniformMatrix4fv(g_moon_light_uniform , 1 , GL_FALSE , glm::value_ptr(moon_light));
+        glm::mat4 light_source = model;
+        glUniformMatrix4fv(g_light_source_uniform , 1 , GL_FALSE , glm::value_ptr(light_source));
+
+        if(spline_t < 1.0f){
+            spline_t += delta_t * 1.1f;
+        } else{
+            spline_t = 0.0f;
+        }
+
+        glm::vec4 spline_p1 = glm::vec4(1.0f,0.0f,0.0f,1.0f);
+        glm::vec4 spline_p2 = glm::vec4(1.0f,0.0f,1.0f,1.0f);
+        glm::vec4 spline_p3 = glm::vec4(-1.0f,0.0f,-1.0f,1.0f);
+        glm::vec4 spline_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);
+        
+        glm::vec4 spline_p12 = spline_p1 + spline_t * (spline_p2 - spline_p1);
+        glm::vec4 spline_p23 = spline_p2 + spline_t * (spline_p3 - spline_p2);
+        glm::vec4 spline_p34 = spline_p3 + spline_t * (spline_p4 - spline_p3);
+        
+        glm::vec4 spline_p123 = spline_p12 + spline_t * (spline_p23 - spline_p12);
+        glm::vec4 spline_p234 = spline_p23 + spline_t * (spline_p34 - spline_p23);
+
+        glm::vec4 spline_c = spline_p123 + spline_t * (spline_p234 - spline_p123);
+        
+    
 
          // Desenhamos o modelo da esfera
-        model = Matrix_Translate(-1.0f,2.0f,0.0f)
+        model = Matrix_Translate(spline_c.x, spline_c.y, spline_c.z)
               * Matrix_Rotate_Z(0.6f)
               * Matrix_Rotate_X(0.2f)
               * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
@@ -617,7 +640,7 @@ int main(int argc, char* argv[])
             smash = false;
             smash_y = 1.0f;         
         }
-        bool boob = intersection_hitsphere(camera_position_c, camera_view_vector, glm::vec4(model[3][0],model[3][1],model[3][2],1.0f));
+        bool boob = intersection_hitsphere(camera_position_c, camera_view_vector, glm::vec4(model[3][0],model[3][1],model[3][2],1.0f), farplane);
 
          // Desenhamos o modelo do inimigo
          for(int i = 0; i < 3; i++){
@@ -826,7 +849,7 @@ void LoadShadersFromFiles()
     g_object_id_uniform  = glGetUniformLocation(g_GpuProgramID, "object_id"); // Variável "object_id" em shader_fragment.glsl
     g_bbox_min_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_min");
     g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");    
-    g_moon_light_uniform  = glGetUniformLocation(g_GpuProgramID, "moon_light");
+    g_light_source_uniform  = glGetUniformLocation(g_GpuProgramID, "light_source");
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
