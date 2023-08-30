@@ -115,6 +115,7 @@ bool tecla_D_pressionada = false;
 bool toggle_V = false;
 bool toggle_F = false;
 bool toggle_E = false;
+bool toggle_G = false;
 bool toggle_1 = false;
 bool toggle_2 = false;
 bool toggle_3 = false;
@@ -382,7 +383,9 @@ int main(int argc, char* argv[])
     
     bool smash = false;
     float smash_y = 1.0f;
-    float spline_t = 0.0f;
+    float beziert = 0.0f;
+    bool way_back = false;
+
     //iniloop
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -595,32 +598,45 @@ int main(int argc, char* argv[])
         glm::mat4 light_source = model;
         glUniformMatrix4fv(g_light_source_uniform , 1 , GL_FALSE , glm::value_ptr(light_source));
 
-        if(spline_t < 1.0f){
-            spline_t += delta_t * 1.1f;
-        } else{
-            spline_t = 0.0f;
+
+        // if(beziert < 1.0f){
+        //     beziert += delta_t * 0.2f;
+        // } else{
+        //     beziert = 0.0f;
+        // }
+
+        if(beziert < 1.0f && !way_back)
+            beziert += delta_t * 0.2f;
+        else{
+            way_back = true;
+            beziert -= delta_t * 0.2f;
+            if(beziert<=0 && way_back){
+                way_back = false;
+                beziert = 0;
+            }
         }
 
-        glm::vec4 spline_p1 = glm::vec4(1.0f,0.0f,0.0f,1.0f);
-        glm::vec4 spline_p2 = glm::vec4(1.0f,0.0f,1.0f,1.0f);
-        glm::vec4 spline_p3 = glm::vec4(-1.0f,0.0f,-1.0f,1.0f);
-        glm::vec4 spline_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);
+        // printf("bezier: %f", beziert);
+        glm::vec4 bezier_p1 = glm::vec4(1.0f,0.0f,0.0f,1.0f);
+        glm::vec4 bezier_p2 = glm::vec4(1.0f,0.0f,1.0f,1.0f);
+        glm::vec4 bezier_p3 = glm::vec4(-1.0f,0.0f,-1.0f,1.0f);
+        glm::vec4 bezier_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);
         
-        glm::vec4 spline_p12 = spline_p1 + spline_t * (spline_p2 - spline_p1);
-        glm::vec4 spline_p23 = spline_p2 + spline_t * (spline_p3 - spline_p2);
-        glm::vec4 spline_p34 = spline_p3 + spline_t * (spline_p4 - spline_p3);
+        glm::vec4 bezier_p12 = bezier_p1 + beziert * (bezier_p2 - bezier_p1);
+        glm::vec4 bezier_p23 = bezier_p2 + beziert * (bezier_p3 - bezier_p2);
+        glm::vec4 bezier_p34 = bezier_p3 + beziert * (bezier_p4 - bezier_p3);
         
-        glm::vec4 spline_p123 = spline_p12 + spline_t * (spline_p23 - spline_p12);
-        glm::vec4 spline_p234 = spline_p23 + spline_t * (spline_p34 - spline_p23);
+        glm::vec4 bezier_p123 = bezier_p12 + beziert * (bezier_p23 - bezier_p12);
+        glm::vec4 bezier_p234 = bezier_p23 + beziert * (bezier_p34 - bezier_p23);
 
-        glm::vec4 spline_c = spline_p123 + spline_t * (spline_p234 - spline_p123);
+        glm::vec4 bezier_c = bezier_p123 + beziert * (bezier_p234 - bezier_p123);
         
     
 
          // Desenhamos o modelo da esfera
-        model = Matrix_Translate(spline_c.x, spline_c.y, spline_c.z)
-              * Matrix_Rotate_Z(0.6f)
-              * Matrix_Rotate_X(0.2f)
+        model = Matrix_Translate(bezier_c.x, bezier_c.y, bezier_c.z)
+              * Matrix_Rotate_Z((float)glfwGetTime() * 0.4f)
+              * Matrix_Rotate_X((float)glfwGetTime() * 0.2f)
               * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
@@ -640,9 +656,10 @@ int main(int argc, char* argv[])
             smash_y += delta_t * smash_speed;
         }
         //fim smash
-        else{
+        if(toggle_G){
             smash = false;
             smash_y = 1.0f;         
+            toggle_G = !toggle_G;
         }
         bool boob = intersection_hitsphere(camera_position_c, camera_view_vector, glm::vec4(model[3][0],model[3][1],model[3][2],1.0f), farplane);
 
@@ -1626,6 +1643,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_F && action == GLFW_PRESS)
     {
         toggle_F = !toggle_F;
+    }
+
+    if (key == GLFW_KEY_G && action == GLFW_PRESS)
+    {
+        toggle_G = !toggle_G;
     }
     // Se o usuário apertar a tecla espaço, resetamos os ângulos de Euler para zero.
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
