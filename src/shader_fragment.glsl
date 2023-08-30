@@ -6,7 +6,6 @@
 // "shader_vertex.glsl" e "main.cpp".
 in vec4 position_world;
 in vec4 normal;
-in vec4 light_source;
 
 // Posição do vértice atual no sistema de coordenadas local do modelo.
 in vec4 position_model;
@@ -27,6 +26,8 @@ uniform mat4 projection;
 #define SKYSPHERE 3
 #define MOON 4
 #define ENEMY 5
+#define TREELEAF 7
+#define TREEBARK 8
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -38,10 +39,12 @@ uniform sampler2D TextureImage0;
 uniform sampler2D TextureImage1;
 uniform sampler2D TextureImage2;
 uniform sampler2D TextureImage3;
+uniform sampler2D TextureImage4;
 uniform sampler2D camo_green;
 uniform sampler2D camo_brown;
 
 
+uniform vec4 light_source;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -69,8 +72,8 @@ void main()
     vec4 n = normalize(normal);
 
     // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
-    vec4 l = normalize(vec4(11.0,10.0,111.0,0.0));
-    // vec4 l = normalize(light_source - position_world);
+    //vec4 l = normalize(vec4(11.0,10.0,111.0,0.0));
+    vec4 l = normalize(light_source - position_world);
 
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
@@ -127,7 +130,7 @@ void main()
         
         
     }
-    else if ( object_id == ENEMY )
+    else if ( object_id == TREELEAF)
     {
         // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
         // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
@@ -163,6 +166,39 @@ void main()
         
         
         
+    }
+    else if ( object_id ==  TREEBARK)
+    {
+        // PREENCHA AQUI as coordenadas de textura do coelho, computadas com
+        // projeção planar XY em COORDENADAS DO MODELO. Utilize como referência
+        // o slides 99-104 do documento Aula_20_Mapeamento_de_Texturas.pdf,
+        // e também use as variáveis min*/max* definidas abaixo para normalizar
+        // as coordenadas de textura U e V dentro do intervalo [0,1]. Para
+        // tanto, veja por exemplo o mapeamento da variável 'p_v' utilizando
+        // 'h' no slides 158-160 do documento Aula_20_Mapeamento_de_Texturas.pdf.
+        // Veja também a Questão 4 do Questionário 4 no Moodle.
+
+        float minx = bbox_min.x;
+        float maxx = bbox_max.x;
+
+        float miny = bbox_min.y;
+        float maxy = bbox_max.y;
+
+        float minz = bbox_min.z;
+        float maxz = bbox_max.z;
+
+        float X = (position_model.x - bbox_min.x)/(bbox_max.x - bbox_min.x);
+        float Y = (position_model.y - bbox_min.y)/(bbox_max.y - bbox_min.y);
+
+        Ks = vec3(0.3,0.3,0.3);
+        Ka = vec3(0.2,0.2,0.2);
+        q = 20.0;
+
+        U = X;
+        V = Y;
+        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
+        Kd0 = texture(TextureImage3, vec2(U,V)).rgb;
+
     }
     else if ( object_id == BUNNY )
     {
@@ -206,7 +242,7 @@ void main()
         Ks = vec3(0.3,0.3,0.3);
         Ka = vec3(0.2,0.2,0.2);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage3, vec2(U,V)).rgb;
     }
     else if ( object_id == SKYSPHERE )
     {
@@ -278,10 +314,19 @@ void main()
 
 
    // Espectro da fonte de iluminação
-    vec3 I = vec3(1.0,1.0,1.0); // PREENCH AQUI o espectro da fonte de luz
-
+   
+    vec3 I = vec3(1.0,1.0,1.0);
+    if(light_source.y < 0) {
+        if(1/(-light_source.y) >= 0){
+            I = vec3(1.0,1.0,1.0)/((-light_source.y/5)+1);
+        }
+        else{
+            I= vec3(0.0,0.0,0.0); // PREENCH AQUI o espectro da fonte de luz
+        }
+    }
     // Espectro da luz ambiente
     vec3 Ia = vec3(0.2,0.2,0.2); // PREENCHA AQUI o espectro da luz ambiente
+    
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
     vec3 lambert_diffuse_term = Kd0 * I * max(0, dot(n, l)); // PREENCHA AQUI o termo difuso de Lambert
@@ -332,7 +377,10 @@ void main()
 
         float lambert = max(0,dot(n,l));
         // color.rgb = (Kd0 * (lambert + 0.01));
-        color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term);
+        if(light_source.y < 0)
+            color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term/((-light_source.y/2)+1));
+        else
+            color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term);
 
     }
 

@@ -326,8 +326,8 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/textures/chess.png");  // TextureImage1
     LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
-    LoadTextureImage("../../data/textures/camo-green.jpg");
-    LoadTextureImage("../../data/textures/camobrown.jpg");
+    LoadTextureImage("../../data/textures/camo-green.jpg"); //3
+    LoadTextureImage("../../data/textures/camobrown.jpg");//4
 
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
@@ -517,6 +517,8 @@ int main(int argc, char* argv[])
         #define MOON 4    
         #define ENEMY 5   
         #define CROSSHAIR 6
+        #define TREELEAF 7
+        #define TREEBARK 8
 
 
 
@@ -584,8 +586,9 @@ int main(int argc, char* argv[])
         // Desenhamos o modelo da esfera
         float raio_lua = abs(farplane);
         float lua_escala = 5.0f;
+        float moon_speed = 0.2f;
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
-              * Matrix_Translate(raio_lua * cos((float)glfwGetTime() * 0.01),raio_lua * sin((float)glfwGetTime() * 0.01),0.0f)
+              * Matrix_Translate(raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
               * Matrix_Rotate_Z(0.6f)
               * Matrix_Rotate_X(0.2f)
               * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.01f)
@@ -595,7 +598,8 @@ int main(int argc, char* argv[])
         DrawVirtualObject("the_sphere");
          
     
-        glm::mat4 light_source = model;
+        glm::vec4 light_source = glm::vec4(model[3][0], model[3][1], model[3][2], 1.0f);
+        glUniform4f(g_light_source_uniform, light_source.x, light_source.y, light_source.z, 1.0f);      
         glUniformMatrix4fv(g_light_source_uniform , 1 , GL_FALSE , glm::value_ptr(light_source));
 
 
@@ -674,8 +678,9 @@ int main(int argc, char* argv[])
                       * Matrix_Scale(0.5f,0.5f/smash_y,0.5f); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-                glUniform1i(g_object_id_uniform, ENEMY);
+                glUniform1i(g_object_id_uniform, TREEBARK);
                 DrawVirtualObject("tree_bark");
+                glUniform1i(g_object_id_uniform, TREELEAF);
                 DrawVirtualObject("tree_leaf");
             }
          }
@@ -878,7 +883,11 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage1"), 1);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage2"), 2);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage3"), 3);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_green"), 4);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage4"), 4);
+   // glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage1"), 5);
+   // glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage2"), 6);
+   // glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage3"), 7);
+    //glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_green"), 4);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_brown"), 5);
     glUseProgram(0);
 }
