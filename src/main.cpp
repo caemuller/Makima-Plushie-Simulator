@@ -325,6 +325,8 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/textures/chess.png");  // TextureImage1
     LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
+    LoadTextureImage("../../data/textures/camo-green.jpg");
+    LoadTextureImage("../../data/textures/camobrown.jpg");
 
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
@@ -632,7 +634,7 @@ int main(int argc, char* argv[])
                       * Matrix_Scale(0.5f,0.5f/smash_y,0.5f); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-                glUniform1i(g_object_id_uniform, SPHERE);
+                glUniform1i(g_object_id_uniform, ENEMY);
                 DrawVirtualObject("tree_bark");
                 DrawVirtualObject("tree_leaf");
             }
@@ -836,6 +838,8 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage1"), 1);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage2"), 2);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage3"), 3);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_green"), 4);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_brown"), 5);
     glUseProgram(0);
 }
 

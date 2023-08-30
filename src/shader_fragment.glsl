@@ -38,6 +38,10 @@ uniform sampler2D TextureImage0;
 uniform sampler2D TextureImage1;
 uniform sampler2D TextureImage2;
 uniform sampler2D TextureImage3;
+uniform sampler2D camo_green;
+uniform sampler2D camo_brown;
+
+
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -154,7 +158,7 @@ void main()
         U = (theta + M_PI)/(2*M_PI);        
         V = (phi + (M_PI_2))/(M_PI);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
+        Kd0 = texture(camo_brown, vec2(U,V)).rgb;
         Ka = Kd0 / 2.0f;
         
         
@@ -190,7 +194,7 @@ void main()
         U = X;
         V = Y;
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(TextureImage3, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
 
     }
     else if ( object_id == PLANE )
@@ -280,7 +284,7 @@ void main()
     vec3 Ia = vec3(0.2,0.2,0.2); // PREENCHA AQUI o espectro da luz ambiente
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
-    vec3 lambert_diffuse_term = Kd * I * max(0, dot(n, l)); // PREENCHA AQUI o termo difuso de Lambert
+    vec3 lambert_diffuse_term = Kd0 * I * max(0, dot(n, l)); // PREENCHA AQUI o termo difuso de Lambert
 
     // Termo ambiente
     vec3 ambient_term = Ka * Ia; // PREENCHA AQUI o termo ambiente
