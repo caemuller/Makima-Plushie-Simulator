@@ -11,11 +11,12 @@ Repo for our project :)
 - [ ] Três tipos de testes de intersecção                
 - [x] Modelos de Iluminação Difusa e Blinn-Phong 
 - [ ] Modelos de Interpolação de Phong e Gouraud         
-- [ ] Mapeamento de texturas em todos os objetos         
-- [ ] Movimentação com curva Bézier cúbica               
+- [x] Mapeamento de texturas em todos os objetos         
+- [x] Movimentação com curva Bézier cúbica               
 - [x] Animações baseadas no tempo ($\Delta t$)   
-- [ ] Makima plushie                                     
+- [ ] Makima plushie   (soon I hope :sunglasses:)                                  
 - [ ] Walls                                              
 - [ ] Enemies                       
-- [ ] Crosshair                     
+- [ ] Crosshair                 
+- [x] Trees    
 |-----------------------------------------------------
