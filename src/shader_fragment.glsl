@@ -197,7 +197,7 @@ void main()
         U = X;
         V = Y;
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(TextureImage3, vec2(U,V)).rgb;
+        Kd0 = texture(camo_brown, vec2(U,V)).rgb;
 
     }
     else if ( object_id == BUNNY )
