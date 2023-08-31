@@ -212,8 +212,8 @@ void main()
         vec4 p_v = p_l - bbox_center;        
 
         Kd0 = texture(makima_color, texcoords).rgb;
-
-        Ka = Kd0 / 2.0f;
+        Ks = vec3(0.3,0.3,0.3);
+        Ka = vec3(0.2,0.2,0.2);
 
     }
     else if ( object_id == PLANE )
@@ -349,7 +349,6 @@ void main()
         if(MOON == object_id){
             color.g *= 1.5;
             color.r *= 1.5;
-
         }
     }
     else{

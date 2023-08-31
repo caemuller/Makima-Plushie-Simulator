@@ -14,7 +14,7 @@ Repo for our project :)
 - [x] Mapeamento de texturas em todos os objetos         
 - [x] Movimentação com curva Bézier cúbica               
 - [x] Animações baseadas no tempo ($\Delta t$)   
-- [ ] Makima plushie   (soon I hope :sunglasses:)                                  
+- [x] Makima plushie   (soon I hope :sunglasses:)                                  
 - [ ] Walls                                              
 - [ ] Enemies                       
 - [ ] Crosshair                 
