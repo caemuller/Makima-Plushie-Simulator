@@ -52,7 +52,7 @@
 
 // Desenhamos os objetos da cena virtual
 #define SPHERE 0
-#define BUNNY  1
+#define GNOME  1
 #define PLANE  2
 #define SKYSPHERE 3
 #define MOON 4    
@@ -345,9 +345,11 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/textures/chess.png");  // TextureImage1
     LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
-    LoadTextureImage("../../data/textures/camo-green.jpg"); //3
-    LoadTextureImage("../../data/textures/camobrown.jpg");//4
-    LoadTextureImage("../../data/textures/makimaovotextura.png");//5
+    LoadTextureImage("../../data/textures/camo-green.jpg"); //4
+    LoadTextureImage("../../data/textures/camobrown.jpg");//5
+    LoadTextureImage("../../data/textures/makimaovotextura.png");//6
+    LoadTextureImage("../../data/textures/gnome_texture.jpg");//7
+
 
 
 
@@ -356,9 +358,9 @@ int main(int argc, char* argv[])
     ComputeNormals(&spheremodel);
     BuildTrianglesAndAddToVirtualScene(&spheremodel);
 
-    ObjModel bunnymodel("../../data/bunny.obj");
-    ComputeNormals(&bunnymodel);
-    BuildTrianglesAndAddToVirtualScene(&bunnymodel);
+    ObjModel gnomemodel("../../data/gnome.obj");
+    ComputeNormals(&gnomemodel);
+    BuildTrianglesAndAddToVirtualScene(&gnomemodel);
 
     ObjModel planemodel("../../data/plane.obj");
     ComputeNormals(&planemodel);
@@ -682,12 +684,8 @@ int main(int argc, char* argv[])
          // Desenhamos o modelo do inimigo
          for(int i = 0; i < 3; i++){
             for(int l = 0; l < 3; l++){
-                srand((unsigned)(i+l));
-                int rand_x = rand() % 10;
-                int rand_z = rand() % 10;   
-                
-                model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0))
-                      * Matrix_Scale(0.5f,0.5f/smash_y,0.5f); 
+                model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0));
+                    //   * Matrix_Scale(0.5f,0.5f/smash_y,0.5f); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, TREEBARK);
@@ -695,21 +693,34 @@ int main(int argc, char* argv[])
                 glUniform1i(g_object_id_uniform, TREELEAF);
                 DrawVirtualObject("tree_leaf");
             }
-         }
+        }
+
+             // Desenhamos o modelo do inimigo
+        for(int i = 0; i < 2; i++){
+            for(int l = 0; l < 2; l++){
+                model = Matrix_Translate(((l*8) - 14.0f),-1.0f ,((i*12) - 8.0)) * Matrix_Scale(5.0f,5.0f/smash_y,5.0f); 
+
+                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(g_object_id_uniform, GNOME);
+                DrawVirtualObject("garden_gnome");
+
+            }
+        }
+
+
        
 
 
         //create last cam posix
-        // Desenhamos o modelo do coelho
+        // Desenhamos o modelo da makima
         if(!toggle_V){
             model = Matrix_Translate(camera_position_c.x+1,camera_position_c.y-0.8,camera_position_c.z+0.3) * 
             Matrix_Translate(-camera_view_vector.x, 0, -camera_view_vector.z);
 
-            // make bunny move as cursor rotates
-
+        // moves makima with cursor
             last_cam_pos = camera_position_c;
         } else{
-            model = Matrix_Translate(last_cam_pos.x,last_cam_pos.y+1,last_cam_pos.z);
+            model = Matrix_Translate(last_cam_pos.x,last_cam_pos.y+0.5,last_cam_pos.z);
         }
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, MAKIMA);
@@ -902,6 +913,8 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_green"), 4);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_brown"), 5);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "makima_color"), 6);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "gnome_color"), 7);
+
 
     glUseProgram(0);
 }

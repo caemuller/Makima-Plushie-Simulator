@@ -21,7 +21,7 @@ uniform mat4 projection;
 
 // Identificador que define qual objeto está sendo desenhado no momento
 #define SPHERE 0
-#define BUNNY  1
+#define GNOME 1
 #define PLANE  2
 #define SKYSPHERE 3
 #define MOON 4
@@ -44,6 +44,8 @@ uniform sampler2D TextureImage4;
 uniform sampler2D camo_green;
 uniform sampler2D camo_brown;
 uniform sampler2D makima_color;
+uniform sampler2D gnome_color;
+
 
 
 uniform vec4 light_source;
@@ -214,6 +216,19 @@ void main()
         Kd0 = texture(makima_color, texcoords).rgb;
         Ks = vec3(0.3,0.3,0.3);
         Ka = vec3(0.2,0.2,0.2);
+
+    }
+    else if ( object_id == GNOME )
+    {
+
+        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+        
+        vec4 p_l = bbox_center + 11* ((position_model - bbox_center)/(length(position_model - bbox_center)));
+        vec4 p_v = p_l - bbox_center;        
+
+        Kd0 = texture(gnome_color, texcoords).rgb;
+        Ks = vec3(0.6,0.6,0.6);
+        Ka = vec3(0.4,0.4,0.4);
 
     }
     else if ( object_id == PLANE )
