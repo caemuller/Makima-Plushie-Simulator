@@ -56,7 +56,7 @@
 #define PLANE  2
 #define SKYSPHERE 3
 #define MOON 4    
-#define ENEMY 5   
+#define TREE 5   
 #define CROSSHAIR 6
 #define TREELEAF 7
 #define TREEBARK 8
@@ -364,9 +364,9 @@ int main(int argc, char* argv[])
     ComputeNormals(&planemodel);
     BuildTrianglesAndAddToVirtualScene(&planemodel);
 
-    ObjModel enemymodel("../../data/Lowpoly_tree_sample.obj");
-    ComputeNormals(&enemymodel);
-    BuildTrianglesAndAddToVirtualScene(&enemymodel);
+    ObjModel treemodel("../../data/Lowpoly_tree_sample.obj");
+    ComputeNormals(&treemodel);
+    BuildTrianglesAndAddToVirtualScene(&treemodel);
 
     ObjModel makimamodel("../../data/makima.obj");
     ComputeNormals(&makimamodel);
