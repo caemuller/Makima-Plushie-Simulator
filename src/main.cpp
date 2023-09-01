@@ -49,6 +49,19 @@
 #include "matrices.h"
 #include "collisions.cpp"
 
+
+// Desenhamos os objetos da cena virtual
+#define SPHERE 0
+#define GNOME  1
+#define PLANE  2
+#define SKYSPHERE 3
+#define MOON 4    
+#define TREE 5   
+#define CROSSHAIR 6
+#define TREELEAF 7
+#define TREEBARK 8
+#define MAKIMA 9
+
 // Estrutura que representa um modelo geométrico carregado a partir de um
 // arquivo ".obj". Veja https://en.wikipedia.org/wiki/Wavefront_.obj_file .
 struct ObjModel
@@ -180,6 +193,11 @@ struct SceneObject
     glm::vec3    bbox_max;
 };
 
+struct Vertex_structure {
+    glm::vec3 position;
+    glm::vec2 uv;
+};
+
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
 // A cena virtual é uma lista de objetos nomeados, guardados em um dicionário
@@ -242,6 +260,7 @@ GLint g_bbox_max_uniform;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
+std::vector<Vertex_structure> makima_vertices;
 
 
 
@@ -326,8 +345,12 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/textures/chess.png");  // TextureImage1
     LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
-    LoadTextureImage("../../data/textures/camo-green.jpg"); //3
-    LoadTextureImage("../../data/textures/camobrown.jpg");//4
+    LoadTextureImage("../../data/textures/camo-green.jpg"); //4
+    LoadTextureImage("../../data/textures/camobrown.jpg");//5
+    LoadTextureImage("../../data/textures/makimaovotextura.png");//6
+    LoadTextureImage("../../data/textures/gnome_texture.jpg");//7
+
+
 
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
@@ -335,17 +358,21 @@ int main(int argc, char* argv[])
     ComputeNormals(&spheremodel);
     BuildTrianglesAndAddToVirtualScene(&spheremodel);
 
-    ObjModel bunnymodel("../../data/bunny.obj");
-    ComputeNormals(&bunnymodel);
-    BuildTrianglesAndAddToVirtualScene(&bunnymodel);
+    ObjModel gnomemodel("../../data/gnome.obj");
+    ComputeNormals(&gnomemodel);
+    BuildTrianglesAndAddToVirtualScene(&gnomemodel);
 
     ObjModel planemodel("../../data/plane.obj");
     ComputeNormals(&planemodel);
     BuildTrianglesAndAddToVirtualScene(&planemodel);
 
-    ObjModel enemymodel("../../data/Lowpoly_tree_sample.obj");
-    ComputeNormals(&enemymodel);
-    BuildTrianglesAndAddToVirtualScene(&enemymodel);
+    ObjModel treemodel("../../data/Lowpoly_tree_sample.obj");
+    ComputeNormals(&treemodel);
+    BuildTrianglesAndAddToVirtualScene(&treemodel);
+
+    ObjModel makimamodel("../../data/makima.obj");
+    ComputeNormals(&makimamodel);
+    BuildTrianglesAndAddToVirtualScene(&makimamodel);
 
     if ( argc > 1 )
     {
@@ -375,7 +402,7 @@ int main(int argc, char* argv[])
     float speed = 2.5f; // Velocidade da câmera
     float prev_time = (float)glfwGetTime();
     
-    camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+    camera_position_c  = glm::vec4(x,y+1,z,1.0f); // Ponto "c", centro da câmera
     glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
     glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
     glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f);
@@ -509,16 +536,6 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
         glUniformMatrix4fv(g_projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
-        // Desenhamos os objetos da cena virtual
-        #define SPHERE 0
-        #define BUNNY  1
-        #define PLANE  2
-        #define SKYSPHERE 3
-        #define MOON 4    
-        #define ENEMY 5   
-        #define CROSSHAIR 6
-        #define TREELEAF 7
-        #define TREEBARK 8
 
 
 
@@ -586,12 +603,9 @@ int main(int argc, char* argv[])
         // Desenhamos o modelo da esfera
         float raio_lua = abs(farplane);
         float lua_escala = 5.0f;
-        float moon_speed = 0.2f;
+        float moon_speed = 0.02f;
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
               * Matrix_Translate(raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
-              * Matrix_Rotate_Z(0.6f)
-              * Matrix_Rotate_X(0.2f)
-              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.01f)
               * Matrix_Scale(lua_escala, lua_escala, lua_escala);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, MOON);
@@ -608,12 +622,12 @@ int main(int argc, char* argv[])
         // } else{
         //     beziert = 0.0f;
         // }
-
+        int bezier_speed = 0.5f;
         if(beziert < 1.0f && !way_back)
-            beziert += delta_t * 0.2f;
+            beziert += delta_t * bezier_speed;
         else{
             way_back = true;
-            beziert -= delta_t * 0.2f;
+            beziert -= delta_t * bezier_speed;
             if(beziert<=0 && way_back){
                 way_back = false;
                 beziert = 0;
@@ -622,8 +636,8 @@ int main(int argc, char* argv[])
 
         // printf("bezier: %f", beziert);
         glm::vec4 bezier_p1 = glm::vec4(1.0f,0.0f,0.0f,1.0f);
-        glm::vec4 bezier_p2 = glm::vec4(1.0f,0.0f,1.0f,1.0f);
-        glm::vec4 bezier_p3 = glm::vec4(-1.0f,0.0f,-1.0f,1.0f);
+        glm::vec4 bezier_p2 = glm::vec4(1.0f,0.0f,4.0f,1.0f);
+        glm::vec4 bezier_p3 = glm::vec4(-1.0f,0.0f,-4.0f,1.0f);
         glm::vec4 bezier_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);
         
         glm::vec4 bezier_p12 = bezier_p1 + beziert * (bezier_p2 - bezier_p1);
@@ -648,6 +662,7 @@ int main(int argc, char* argv[])
 
         
         int smash_speed = 10;
+        
         //smash on
         if (toggle_E)
         {        
@@ -669,15 +684,10 @@ int main(int argc, char* argv[])
         float tree_center = 20;
         float tree_distance= 10;
          // Desenhamos o modelo do inimigo
-         for(int i = 0; i < 4; i++){
-            for(int l = 0; l < 4; l++){
-                srand((unsigned)(i+l));
-                int rand_x = rand() % 10;
-                int rand_z = rand() % 10;   
-                
-                model = Matrix_Translate(((l*tree_distance) - tree_center),-1.1f ,((i*tree_distance) - tree_center))
-                      * Matrix_Scale(0.5f,0.5f/smash_y,0.5f)
-                      * Matrix_Rotate_Y(rand_x);; 
+         for(int i = 0; i < 3; i++){
+            for(int l = 0; l < 3; l++){
+                model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0));
+                    //   * Matrix_Scale(0.5f,0.5f/smash_y,0.5f); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, TREEBARK);
@@ -685,25 +695,39 @@ int main(int argc, char* argv[])
                 glUniform1i(g_object_id_uniform, TREELEAF);
                 DrawVirtualObject("tree_leaf");
             }
-         }
+        }
+
+             // Desenhamos o modelo do inimigo
+        for(int i = 0; i < 2; i++){
+            for(int l = 0; l < 2; l++){
+                model = Matrix_Translate(((l*8) - 14.0f) + bezier_c.x,-1.0f ,  bezier_c.z + ((i*12) - 8.0)) 
+                      * Matrix_Scale(5.0f,5.0f/smash_y,5.0f); 
+
+                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(g_object_id_uniform, GNOME);
+                DrawVirtualObject("garden_gnome");
+
+            }
+        }
+
+
        
 
 
         //create last cam posix
-        // Desenhamos o modelo do coelho
+        // Desenhamos o modelo da makima
         if(!toggle_V){
             model = Matrix_Translate(camera_position_c.x+1,camera_position_c.y-0.8,camera_position_c.z+0.3) * 
             Matrix_Translate(-camera_view_vector.x, 0, -camera_view_vector.z);
 
-            // make bunny move as cursor rotates
-
+        // moves makima with cursor
             last_cam_pos = camera_position_c;
         } else{
-            model = Matrix_Translate(last_cam_pos.x,last_cam_pos.y,last_cam_pos.z);
+            model = Matrix_Translate(last_cam_pos.x,last_cam_pos.y+0.5,last_cam_pos.z);
         }
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, BUNNY);
-        DrawVirtualObject("the_bunny");
+        glUniform1i(g_object_id_uniform, MAKIMA);
+        DrawVirtualObject("makima_plushie");
 
         // Desenhamos o plano do chão
         model = Matrix_Translate(0.0f,-1.1f,0.0f)
@@ -889,8 +913,12 @@ void LoadShadersFromFiles()
    // glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage1"), 5);
    // glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage2"), 6);
    // glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage3"), 7);
-    //glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_green"), 4);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_green"), 4);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "camo_brown"), 5);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "makima_color"), 6);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "gnome_color"), 7);
+
+
     glUseProgram(0);
 }
 
@@ -899,6 +927,23 @@ void PushMatrix(glm::mat4 M)
 {
     g_MatrixStack.push(M);
 }
+
+// void Load_makima(){
+//     }
+
+//     GLuint vertexBuffer;
+//     glGenBuffers(1, &vertexBuffer);
+//     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+//     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_structure), &vertices[0], GL_STATIC_DRAW);
+
+//     // Set the position attribute
+//     glEnableVertexAttribArray(0);
+//     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_structure), (void*)offsetof(Vertex_structure, position));
+
+//     // Set the UV coordinate attribute
+//     glEnableVertexAttribArray(1);
+//     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_structure), (void*)offsetof(Vertex_structure, uv));
+// }
 
 // Função que remove a matriz atualmente no topo da pilha e armazena a mesma na variável M
 void PopMatrix(glm::mat4& M)

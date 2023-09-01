@@ -21,13 +21,14 @@ uniform mat4 projection;
 
 // Identificador que define qual objeto está sendo desenhado no momento
 #define SPHERE 0
-#define BUNNY  1
+#define GNOME 1
 #define PLANE  2
 #define SKYSPHERE 3
 #define MOON 4
 #define ENEMY 5
 #define TREELEAF 7
 #define TREEBARK 8
+#define MAKIMA 9
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -42,12 +43,16 @@ uniform sampler2D TextureImage3;
 uniform sampler2D TextureImage4;
 uniform sampler2D camo_green;
 uniform sampler2D camo_brown;
+uniform sampler2D makima_color;
+uniform sampler2D gnome_color;
+
 
 
 uniform vec4 light_source;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
+
 
 // Constantes
 #define M_PI   3.14159265358979323846
@@ -197,40 +202,33 @@ void main()
         U = X;
         V = Y;
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(TextureImage3, vec2(U,V)).rgb;
+        Kd0 = texture(camo_brown, vec2(U,V)).rgb;
 
     }
-    else if ( object_id == BUNNY )
+    else if ( object_id == MAKIMA )
     {
-        // PREENCHA AQUI as coordenadas de textura do coelho, computadas com
-        // projeção planar XY em COORDENADAS DO MODELO. Utilize como referência
-        // o slides 99-104 do documento Aula_20_Mapeamento_de_Texturas.pdf,
-        // e também use as variáveis min*/max* definidas abaixo para normalizar
-        // as coordenadas de textura U e V dentro do intervalo [0,1]. Para
-        // tanto, veja por exemplo o mapeamento da variável 'p_v' utilizando
-        // 'h' no slides 158-160 do documento Aula_20_Mapeamento_de_Texturas.pdf.
-        // Veja também a Questão 4 do Questionário 4 no Moodle.
 
-        float minx = bbox_min.x;
-        float maxx = bbox_max.x;
+        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+        
+        vec4 p_l = bbox_center + 11* ((position_model - bbox_center)/(length(position_model - bbox_center)));
+        vec4 p_v = p_l - bbox_center;        
 
-        float miny = bbox_min.y;
-        float maxy = bbox_max.y;
-
-        float minz = bbox_min.z;
-        float maxz = bbox_max.z;
-
-        float X = (position_model.x - bbox_min.x)/(bbox_max.x - bbox_min.x);
-        float Y = (position_model.y - bbox_min.y)/(bbox_max.y - bbox_min.y);
-
+        Kd0 = texture(makima_color, texcoords).rgb;
         Ks = vec3(0.3,0.3,0.3);
         Ka = vec3(0.2,0.2,0.2);
-        q = 20.0;
 
-        U = X;
-        V = Y;
-        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
+    }
+    else if ( object_id == GNOME )
+    {
+
+        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+        
+        vec4 p_l = bbox_center + 11* ((position_model - bbox_center)/(length(position_model - bbox_center)));
+        vec4 p_v = p_l - bbox_center;        
+
+        Kd0 = texture(gnome_color, texcoords).rgb;
+        Ks = vec3(0.6,0.6,0.6);
+        Ka = vec3(0.4,0.4,0.4);
 
     }
     else if ( object_id == PLANE )
@@ -366,7 +364,6 @@ void main()
         if(MOON == object_id){
             color.g *= 1.5;
             color.r *= 1.5;
-
         }
     }
     else{
