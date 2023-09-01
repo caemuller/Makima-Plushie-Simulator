@@ -193,10 +193,12 @@ struct SceneObject
     glm::vec3    bbox_max;
 };
 
-struct Vertex_structure {
-    glm::vec3 position;
-    glm::vec2 uv;
+struct Enemy_type{
+    bool smash;
+    int id;
 };
+
+std::vector<Enemy_type> enemy_vector;
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
@@ -260,7 +262,6 @@ GLint g_bbox_max_uniform;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
-std::vector<Vertex_structure> makima_vertices;
 
 
 
@@ -925,22 +926,6 @@ void PushMatrix(glm::mat4 M)
     g_MatrixStack.push(M);
 }
 
-// void Load_makima(){
-//     }
-
-//     GLuint vertexBuffer;
-//     glGenBuffers(1, &vertexBuffer);
-//     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-//     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_structure), &vertices[0], GL_STATIC_DRAW);
-
-//     // Set the position attribute
-//     glEnableVertexAttribArray(0);
-//     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_structure), (void*)offsetof(Vertex_structure, position));
-
-//     // Set the UV coordinate attribute
-//     glEnableVertexAttribArray(1);
-//     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_structure), (void*)offsetof(Vertex_structure, uv));
-// }
 
 // Função que remove a matriz atualmente no topo da pilha e armazena a mesma na variável M
 void PopMatrix(glm::mat4& M)
