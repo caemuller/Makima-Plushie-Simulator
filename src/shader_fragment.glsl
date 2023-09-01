@@ -6,6 +6,7 @@
 // "shader_vertex.glsl" e "main.cpp".
 in vec4 position_world;
 in vec4 normal;
+in vec4 color_v;
 
 // Posição do vértice atual no sistema de coordenadas local do modelo.
 in vec4 position_model;
@@ -49,6 +50,7 @@ uniform sampler2D gnome_color;
 
 
 uniform vec4 light_source;
+uniform int rasterization_type;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -129,7 +131,10 @@ void main()
         U = (theta + M_PI)/(2*M_PI);        
         V = (phi + (M_PI_2))/(M_PI);
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
+
+        
         Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
+        
         Ka = Kd0 / 2.0f;
         
         
@@ -310,8 +315,10 @@ void main()
         
     }
 
+    if(rasterization_type == 0){
 
-   // Espectro da fonte de iluminação
+    Kd = vec3(0.3, 0.3, 0.3);
+    // Espectro da fonte de iluminação
    
     vec3 I = vec3(1.0,1.0,1.0);
     if(light_source.y < 0) {
@@ -327,7 +334,7 @@ void main()
     
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
-    vec3 lambert_diffuse_term = Kd0 * I * max(0, dot(n, l)); // PREENCHA AQUI o termo difuso de Lambert
+    vec3 lambert_diffuse_term =  Kd * I * max(0, dot(n, l)); // PREENCHA AQUI o termo difuso de Lambert
 
     // Termo ambiente
     vec3 ambient_term = Ka * Ia; // PREENCHA AQUI o termo ambiente
@@ -338,9 +345,7 @@ void main()
     vec4 h = normalize(l + v);
 
     vec3 blinn_phong_specular_term  = Ks * I * pow(max(0, dot(h, n)), q); // PREENCH AQUI o termo especular de Blinn-Phong
-
- 
-    
+   
     
     if(object_id == SKYSPHERE || object_id == MOON){
         
@@ -351,18 +356,17 @@ void main()
         }
     }
     else{
-        // Equação de Iluminação
-        lambert_diffuse_term = Kd0 * I * max(0, dot(n, l));
-        vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q);
-        vec3 blinn_phong_specular_term  = Ks * I * pow(max(0, dot(h, n)), q);
-
-        float lambert = max(0,dot(n,l));
-        // color.rgb = (Kd0 * (lambert + 0.01));
         if(light_source.y < 0)
             color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term/((-light_source.y)+1));
         else
             color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term);
 
+    }
+
+    }
+
+    else if(rasterization_type == 1){
+        color.rgb = Kd0 * color_v.rgb;
     }
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é

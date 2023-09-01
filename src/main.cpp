@@ -257,6 +257,7 @@ GLint g_projection_uniform;
 GLint g_object_id_uniform;
 GLint g_bbox_min_uniform;
 GLint g_bbox_max_uniform;
+GLint g_rasterization_type_uniform;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
@@ -536,8 +537,11 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
         glUniformMatrix4fv(g_projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
-
-
+        //rasterization type
+        // 0 for Phong
+        //1 for Gouraud
+        int rasterization_type = 0;
+        glUniform1i(g_rasterization_type_uniform, rasterization_type);
 
         //desenha no infinito
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
@@ -622,7 +626,7 @@ int main(int argc, char* argv[])
         // } else{
         //     beziert = 0.0f;
         // }
-        int bezier_speed = 2.5f;
+        int bezier_speed = 0.5f;
         if(beziert < 1.0f && !way_back)
             beziert += delta_t * bezier_speed;
         else{
@@ -650,7 +654,7 @@ int main(int argc, char* argv[])
         glm::vec4 bezier_c = bezier_p123 + beziert * (bezier_p234 - bezier_p123);
         
     
-
+        glUniform1i(g_rasterization_type_uniform, rasterization_type);
          // Desenhamos o modelo da esfera
         model = Matrix_Translate(bezier_c.x, bezier_c.y, bezier_c.z)
               * Matrix_Rotate_Z((float)glfwGetTime() * 0.4f)
@@ -659,6 +663,8 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
+
+        glUniform1i(g_rasterization_type_uniform, rasterization_type);
 
         
         int smash_speed = 10;
@@ -902,6 +908,7 @@ void LoadShadersFromFiles()
     g_bbox_min_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_min");
     g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");    
     g_light_source_uniform  = glGetUniformLocation(g_GpuProgramID, "light_source");
+    g_rasterization_type_uniform  = glGetUniformLocation(g_GpuProgramID, "rasterization_type");
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
