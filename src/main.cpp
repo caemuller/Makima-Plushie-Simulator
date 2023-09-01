@@ -622,7 +622,7 @@ int main(int argc, char* argv[])
         // } else{
         //     beziert = 0.0f;
         // }
-        int bezier_speed = 0.5f;
+        int bezier_speed = 2.5f;
         if(beziert < 1.0f && !way_back)
             beziert += delta_t * bezier_speed;
         else{
