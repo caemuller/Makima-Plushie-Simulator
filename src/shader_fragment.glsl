@@ -378,7 +378,7 @@ void main()
         float lambert = max(0,dot(n,l));
         // color.rgb = (Kd0 * (lambert + 0.01));
         if(light_source.y < 0)
-            color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term/((-light_source.y/2)+1));
+            color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term/((-light_source.y)+1));
         else
             color.rgb = Kd0 * (lambert_diffuse_term + ambient_term + blinn_phong_specular_term);
 

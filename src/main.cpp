@@ -666,16 +666,18 @@ int main(int argc, char* argv[])
             toggle_G = !toggle_G;
         }
         bool boob = intersection_hitsphere(camera_position_c, camera_view_vector, glm::vec4(model[3][0],model[3][1],model[3][2],1.0f), farplane);
-
+        float tree_center = 20;
+        float tree_distance= 10;
          // Desenhamos o modelo do inimigo
-         for(int i = 0; i < 3; i++){
-            for(int l = 0; l < 3; l++){
+         for(int i = 0; i < 4; i++){
+            for(int l = 0; l < 4; l++){
                 srand((unsigned)(i+l));
                 int rand_x = rand() % 10;
                 int rand_z = rand() % 10;   
                 
-                model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0))
-                      * Matrix_Scale(0.5f,0.5f/smash_y,0.5f); 
+                model = Matrix_Translate(((l*tree_distance) - tree_center),-1.1f ,((i*tree_distance) - tree_center))
+                      * Matrix_Scale(0.5f,0.5f/smash_y,0.5f)
+                      * Matrix_Rotate_Y(rand_x);; 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, TREEBARK);
