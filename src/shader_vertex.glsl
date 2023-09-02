@@ -11,6 +11,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform vec4 light_source;
+uniform int rasterization_type;
+
 
 // Atributos de vértice que serão gerados como saída ("out") pelo Vertex Shader.
 // ** Estes serão interpolados pelo rasterizador! ** gerando, assim, valores
@@ -20,6 +22,7 @@ out vec4 position_world;
 out vec4 position_model;
 out vec4 normal;
 out vec2 texcoords;
+out vec4 color_v;
 
 void main()
 {
@@ -64,5 +67,58 @@ void main()
 
     // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
     texcoords = texture_coefficients;
+
+    
+    //rasterizado
+    
+    if(rasterization_type == 1)
+    {
+    // Espectro da fonte de iluminação
+    vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
+    vec4 camera_position = inverse(view) * origin;
+    vec4 l = normalize(light_source - position_world);
+    vec4 n = normalize(normal);
+    vec4 v = normalize(camera_position - position_world);
+    vec4 r = normalize(-l + 2 * n * dot(n, l));
+    float q = 1.0; // Expoente especular para o modelo de iluminação de Phong
+   
+    vec3 Kd = vec3(0.3, 0.3, 0.3);
+    vec3 Ka = vec3(0.3, 0.3, 0.3);
+    vec3 Ks = vec3(0.3, 0.3, 0.3);
+    vec3 I = vec3(1.0,1.0,1.0);
+    if(light_source.y < 0) {
+        if(1/(-light_source.y) >= 0){
+            I = vec3(1.0,1.0,1.0)/((-light_source.y/5)+1);
+        }
+        else{
+            I= vec3(0.0,0.0,0.0); // PREENCH AQUI o espectro da fonte de luz
+        }
+    }
+    // Espectro da luz ambiente
+    vec3 Ia = vec3(0.2,0.2,0.2); // PREENCHA AQUI o espectro da luz ambiente
+    
+
+    // Termo difuso utilizando a lei dos cossenos de Lambert
+    vec3 lambert_diffuse_term =  Kd * I * max(0, dot(n, l)); // PREENCHA AQUI o termo difuso de Lambert
+
+    // Termo ambiente
+    vec3 ambient_term = Ka * Ia; // PREENCHA AQUI o termo ambiente
+
+    // Termo especular utilizando o modelo de iluminação de Phong
+    vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // PREENCH AQUI o termo especular de Phong
+
+    vec4 h = normalize(l + v);
+
+    vec3 blinn_phong_specular_term  = Ks * I * pow(max(0, dot(h, n)), q); // PREENCH AQUI o termo especular de Blinn-Phong
+
+    
+    color_v.a = 1;
+    if(light_source.y < 0)
+        color_v.rgb = (lambert_diffuse_term + ambient_term + blinn_phong_specular_term/((-light_source.y)+1));
+    else
+        color_v.rgb = (lambert_diffuse_term + ambient_term + blinn_phong_specular_term);
+    
+    }
+
 }
 

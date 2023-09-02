@@ -193,10 +193,12 @@ struct SceneObject
     glm::vec3    bbox_max;
 };
 
-struct Vertex_structure {
-    glm::vec3 position;
-    glm::vec2 uv;
+struct Enemy_type{
+    bool smash;
+    int id;
 };
+
+std::vector<Enemy_type> enemy_vector;
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
@@ -257,10 +259,10 @@ GLint g_projection_uniform;
 GLint g_object_id_uniform;
 GLint g_bbox_min_uniform;
 GLint g_bbox_max_uniform;
+GLint g_rasterization_type_uniform;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
-std::vector<Vertex_structure> makima_vertices;
 
 
 
@@ -536,8 +538,11 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
         glUniformMatrix4fv(g_projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
-
-
+        //rasterization type
+        // 0 for Phong
+        //1 for Gouraud
+        int rasterization_type = 0;
+        glUniform1i(g_rasterization_type_uniform, rasterization_type);
 
         //desenha no infinito
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
@@ -603,7 +608,7 @@ int main(int argc, char* argv[])
         // Desenhamos o modelo da esfera
         float raio_lua = abs(farplane);
         float lua_escala = 5.0f;
-        float moon_speed = 0.2f;
+        float moon_speed = 0.02f;
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
               * Matrix_Translate(raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
               * Matrix_Scale(lua_escala, lua_escala, lua_escala);
@@ -622,12 +627,12 @@ int main(int argc, char* argv[])
         // } else{
         //     beziert = 0.0f;
         // }
-
+        int bezier_speed = 0.5f;
         if(beziert < 1.0f && !way_back)
-            beziert += delta_t * 0.2f;
+            beziert += delta_t * bezier_speed;
         else{
             way_back = true;
-            beziert -= delta_t * 0.2f;
+            beziert -= delta_t * bezier_speed;
             if(beziert<=0 && way_back){
                 way_back = false;
                 beziert = 0;
@@ -636,8 +641,8 @@ int main(int argc, char* argv[])
 
         // printf("bezier: %f", beziert);
         glm::vec4 bezier_p1 = glm::vec4(1.0f,0.0f,0.0f,1.0f);
-        glm::vec4 bezier_p2 = glm::vec4(1.0f,0.0f,1.0f,1.0f);
-        glm::vec4 bezier_p3 = glm::vec4(-1.0f,0.0f,-1.0f,1.0f);
+        glm::vec4 bezier_p2 = glm::vec4(1.0f,0.0f,4.0f,1.0f);
+        glm::vec4 bezier_p3 = glm::vec4(-1.0f,0.0f,-4.0f,1.0f);
         glm::vec4 bezier_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);
         
         glm::vec4 bezier_p12 = bezier_p1 + beziert * (bezier_p2 - bezier_p1);
@@ -650,7 +655,7 @@ int main(int argc, char* argv[])
         glm::vec4 bezier_c = bezier_p123 + beziert * (bezier_p234 - bezier_p123);
         
     
-
+        glUniform1i(g_rasterization_type_uniform, rasterization_type);
          // Desenhamos o modelo da esfera
         model = Matrix_Translate(bezier_c.x, bezier_c.y, bezier_c.z)
               * Matrix_Rotate_Z((float)glfwGetTime() * 0.4f)
@@ -660,8 +665,11 @@ int main(int argc, char* argv[])
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
 
+        glUniform1i(g_rasterization_type_uniform, rasterization_type);
+
         
         int smash_speed = 10;
+        
         //smash on
         if (toggle_E)
         {        
@@ -680,7 +688,8 @@ int main(int argc, char* argv[])
             toggle_G = !toggle_G;
         }
         bool boob = intersection_hitsphere(camera_position_c, camera_view_vector, glm::vec4(model[3][0],model[3][1],model[3][2],1.0f), farplane);
-
+        float tree_center = 20;
+        float tree_distance= 10;
          // Desenhamos o modelo do inimigo
          for(int i = 0; i < 3; i++){
             for(int l = 0; l < 3; l++){
@@ -698,7 +707,8 @@ int main(int argc, char* argv[])
              // Desenhamos o modelo do inimigo
         for(int i = 0; i < 2; i++){
             for(int l = 0; l < 2; l++){
-                model = Matrix_Translate(((l*8) - 14.0f),-1.0f ,((i*12) - 8.0)) * Matrix_Scale(5.0f,5.0f/smash_y,5.0f); 
+                model = Matrix_Translate(((l*8) - 14.0f) + bezier_c.x,-1.0f ,  bezier_c.z + ((i*12) - 8.0)) 
+                      * Matrix_Scale(5.0f,5.0f/smash_y,5.0f); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, GNOME);
@@ -899,6 +909,7 @@ void LoadShadersFromFiles()
     g_bbox_min_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_min");
     g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");    
     g_light_source_uniform  = glGetUniformLocation(g_GpuProgramID, "light_source");
+    g_rasterization_type_uniform  = glGetUniformLocation(g_GpuProgramID, "rasterization_type");
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
@@ -925,22 +936,6 @@ void PushMatrix(glm::mat4 M)
     g_MatrixStack.push(M);
 }
 
-// void Load_makima(){
-//     }
-
-//     GLuint vertexBuffer;
-//     glGenBuffers(1, &vertexBuffer);
-//     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-//     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_structure), &vertices[0], GL_STATIC_DRAW);
-
-//     // Set the position attribute
-//     glEnableVertexAttribArray(0);
-//     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_structure), (void*)offsetof(Vertex_structure, position));
-
-//     // Set the UV coordinate attribute
-//     glEnableVertexAttribArray(1);
-//     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_structure), (void*)offsetof(Vertex_structure, uv));
-// }
 
 // Função que remove a matriz atualmente no topo da pilha e armazena a mesma na variável M
 void PopMatrix(glm::mat4& M)
