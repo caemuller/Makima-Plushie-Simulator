@@ -287,6 +287,10 @@ int main(int argc, char* argv[])
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+    print2();
+    print2();
+    print2();
+    print2();
     #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
@@ -718,9 +722,6 @@ int main(int argc, char* argv[])
         }
 
 
-       
-
-
         //create last cam posix
         // Desenhamos o modelo da makima
         if(!toggle_V){
@@ -1059,20 +1060,22 @@ GLuint Build_crosshair(){
     //
     // Este vetor "indices" define a TOPOLOGIA (veja slides 103-110 do documento Aula_04_Modelagem_Geometrica_3D.pdf).
     //
- GLubyte indices[34]; // GLubyte: valores entre 0 e 255 (8 bits sem sinal).
- int cc=0;
-        for(int i=0; i<=32; i+=2){
-            indices[i] = cc;
-            cc++;
-        }
-        cc=16;
-        for(int i=1; i<32; i+=2){
-            indices[i] = cc;
-            cc++;
-        }
 
-        indices[32] = 0;
-        indices[33] = 16;
+
+    GLubyte indices[34]; // GLubyte: valores entre 0 e 255 (8 bits sem sinal).
+    int cc=0;
+            for(int i=0; i<=32; i+=2){
+                indices[i] = cc;
+                cc++;
+            }
+            cc=16;
+            for(int i=1; i<32; i+=2){
+                indices[i] = cc;
+                cc++;
+            }
+
+            indices[32] = 0;
+            indices[33] = 16;
 
     GLuint indices_id;
     glGenBuffers(1, &indices_id);
