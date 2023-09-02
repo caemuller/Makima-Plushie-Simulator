@@ -180,6 +180,8 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
+//curva de bezier cubica
+glm::vec4 bezier_cubic_curve(glm::vec4 bezier_p1, glm::vec4 bezier_p2, glm::vec4 bezier_p3, glm::vec4 bezier_p4, float beziert);
 // Definimos uma estrutura que armazenará dados necessários para renderizar
 // cada objeto da cena virtual.
 struct SceneObject
@@ -347,7 +349,7 @@ int main(int argc, char* argv[])
     LoadTextureImage("../../data/textures/chess.png");  // TextureImage1
     LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
-    LoadTextureImage("../../data/textures/camo-green.jpg"); //4
+    LoadTextureImage("../../data/textures/133e153db52855f1394726a65ff7ef92.jpg"); //4
     LoadTextureImage("../../data/textures/camobrown.jpg");//5
     LoadTextureImage("../../data/textures/makimaovotextura.png");//6
     LoadTextureImage("../../data/textures/gnome_texture.jpg");//7
@@ -615,7 +617,6 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, MOON);
         DrawVirtualObject("the_sphere");
-         
     
         glm::vec4 light_source = glm::vec4(model[3][0], model[3][1], model[3][2], 1.0f);
         glUniform4f(g_light_source_uniform, light_source.x, light_source.y, light_source.z, 1.0f);      
@@ -627,7 +628,7 @@ int main(int argc, char* argv[])
         // } else{
         //     beziert = 0.0f;
         // }
-        int bezier_speed = 0.5f;
+        int bezier_speed = 0.8f;
         if(beziert < 1.0f && !way_back)
             beziert += delta_t * bezier_speed;
         else{
@@ -641,30 +642,24 @@ int main(int argc, char* argv[])
 
         // printf("bezier: %f", beziert);
         glm::vec4 bezier_p1 = glm::vec4(1.0f,0.0f,0.0f,1.0f);
-        glm::vec4 bezier_p2 = glm::vec4(1.0f,0.0f,4.0f,1.0f);
-        glm::vec4 bezier_p3 = glm::vec4(-1.0f,0.0f,-4.0f,1.0f);
-        glm::vec4 bezier_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);
+        glm::vec4 bezier_p2 = glm::vec4(1.0f,0.0f,1.0f,1.0f);
+        glm::vec4 bezier_p3 = glm::vec4(-1.0f,0.0f,1.0f,1.0f);
+        glm::vec4 bezier_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);        
+       
+        glm::vec4 bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert);
         
-        glm::vec4 bezier_p12 = bezier_p1 + beziert * (bezier_p2 - bezier_p1);
-        glm::vec4 bezier_p23 = bezier_p2 + beziert * (bezier_p3 - bezier_p2);
-        glm::vec4 bezier_p34 = bezier_p3 + beziert * (bezier_p4 - bezier_p3);
-        
-        glm::vec4 bezier_p123 = bezier_p12 + beziert * (bezier_p23 - bezier_p12);
-        glm::vec4 bezier_p234 = bezier_p23 + beziert * (bezier_p34 - bezier_p23);
-
-        glm::vec4 bezier_c = bezier_p123 + beziert * (bezier_p234 - bezier_p123);
-        
-    
+        rasterization_type = 1;
         glUniform1i(g_rasterization_type_uniform, rasterization_type);
          // Desenhamos o modelo da esfera
-        model = Matrix_Translate(bezier_c.x, bezier_c.y, bezier_c.z)
-              * Matrix_Rotate_Z((float)glfwGetTime() * 0.4f)
-              * Matrix_Rotate_X((float)glfwGetTime() * 0.2f)
-              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
+        model = Matrix_Translate(bezier_c.x,bezier_c.y,bezier_c.z)
+              * Matrix_Scale(2.0f,2.0f,2.0f)
+              * Matrix_Rotate_Y(delta_t);
+             // intersection_hitbox(camera_position_c, camera_view_vector, spheremodel.bbox_min,spheremodel.bbox_max);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
 
+        rasterization_type = 0;
         glUniform1i(g_rasterization_type_uniform, rasterization_type);
 
         
@@ -687,7 +682,6 @@ int main(int argc, char* argv[])
             smash_y = 1.0f;         
             toggle_G = !toggle_G;
         }
-        bool boob = intersection_hitsphere(camera_position_c, camera_view_vector, glm::vec4(model[3][0],model[3][1],model[3][2],1.0f), farplane);
         float tree_center = 20;
         float tree_distance= 10;
          // Desenhamos o modelo do inimigo
@@ -779,6 +773,20 @@ int main(int argc, char* argv[])
 
     // Fim do programa
     return 0;
+}
+
+glm::vec4 bezier_cubic_curve(glm::vec4 bezier_p1, glm::vec4 bezier_p2, glm::vec4 bezier_p3, glm::vec4 bezier_p4, float beziert){
+    
+    glm::vec4 bezier_p12 = bezier_p1 + beziert * (bezier_p2 - bezier_p1);
+    glm::vec4 bezier_p23 = bezier_p2 + beziert * (bezier_p3 - bezier_p2);
+    glm::vec4 bezier_p34 = bezier_p3 + beziert * (bezier_p4 - bezier_p3);
+    
+    glm::vec4 bezier_p123 = bezier_p12 + beziert * (bezier_p23 - bezier_p12);
+    glm::vec4 bezier_p234 = bezier_p23 + beziert * (bezier_p34 - bezier_p23);
+
+    glm::vec4 bezier_c = bezier_p123 + beziert * (bezier_p234 - bezier_p123);
+
+    return bezier_c;
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
@@ -935,7 +943,6 @@ void PushMatrix(glm::mat4 M)
 {
     g_MatrixStack.push(M);
 }
-
 
 // Função que remove a matriz atualmente no topo da pilha e armazena a mesma na variável M
 void PopMatrix(glm::mat4& M)
