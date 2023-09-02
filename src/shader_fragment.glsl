@@ -133,7 +133,7 @@ void main()
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
 
         
-        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage4, vec2(U,V)).rgb;
         
         Ka = Kd0 / 2.0f;
         
