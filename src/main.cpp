@@ -738,8 +738,10 @@ int main(int argc, char* argv[])
          // Desenhamos o modelo do inimigo
          for(int i = 0; i < 3; i++){
             for(int l = 0; l < 3; l++){
-                model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0));
-                    //   * Matrix_Scale(0.5f,0.5f/smash_y,0.5f); 
+                srand(i+l*10);
+                float tree_scale = rand()%3 + 2;
+                model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0))
+                      * Matrix_Scale(0.5f *tree_scale +(rand()%2 + 1)/3, tree_scale* 0.5f, 0.5f *tree_scale+(rand()%2 + 1)/3); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, TREEBARK);
