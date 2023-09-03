@@ -22,6 +22,7 @@ Repo for our project :heart:
 |-----------------------------------------------------
 
 Contribuições
+
 Caetano: 
 - Malhas poligonais complexas - gnomo
 - Makima (Main character)
