@@ -24,6 +24,7 @@ Repo for our project :heart:
 Contribuições
 Caetano: 
 - Malhas poligonais complexas - gnomo
+- Makima (Main character)
 - Câmera livre e câmera look-at
 - Modelos de Iluminação Difusa e Blinn-Phong
 - Mapeamento de texturas em todos os objetos
@@ -31,11 +32,13 @@ Caetano:
 - Crosshair
  
 Victor:
+- Malhas poligonais complexas - Arvores
 - Modelos de Interpolação de Phong e Gouraud
 - Transformações geométricas controlada pelo usuário - SMASH
 - Mapeamento de texturas em todos os objetos
 - Movimentação com curva Bézier cúbica
 - Animações baseadas no tempo ($\Delta t$)
+- Iluminacao feita pela Lua
 
 Animações, instancias de objetos, mapeamento de texturas entre outras implementações repetitivas e relativamete simples foram feitos por ambos.
 
@@ -53,12 +56,13 @@ Aplicação dos conceitos de computação gráfica:
 
 Manual do Makima plushie simulator(MAKIMA SMASH):
 Interações:
-W,S,A,D: utilizados para movimentação do personagem(camera).
-E: SMASH.
-1: Habilita o crosshair.
-V: Trocar entre camera look-at e free-view.
-P, O: trocam entre as projeções(herança do laboratório, e buga a skysphere).
+- W,S,A,D: utilizados para movimentação do personagem(camera).
+- E: SMASH.
+- 1: Habilita o crosshair.
+- V: Trocar entre camera look-at e free-view.
+- P, O: trocam entre as projeções(herança do laboratório, e buga a skysphere).
+
 
 Jogo:
-O objetivo do jogo eh AMAÇAR os gnomos. Acompanhado de uma ambientação ABSURDA. E com umas bolinhas amigas
+O objetivo do jogo eh AMASSAR os gnomos. Acompanhado de uma ambientação ABSURDA. E com umas bolinhas amigas
 
