@@ -198,10 +198,19 @@ struct SceneObject
 struct Enemy_type{
     bool smash;
     int id;
+    glm::vec3 bbox_min;
+    glm::vec3 bbox_max;
+};
+
+struct Object_type{
+    bool collision;
+    int id;
+    glm::vec3 bbox_min;
+    glm::vec3 bbox_max;
 };
 
 std::vector<Enemy_type> enemy_vector;
-
+std::vector<Object_type> object_vector;
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
 // A cena virtual é uma lista de objetos nomeados, guardados em um dicionário
@@ -265,7 +274,6 @@ GLint g_rasterization_type_uniform;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
-
 
 
 int main(int argc, char* argv[])
@@ -415,16 +423,22 @@ int main(int argc, char* argv[])
     bool smash = false;
     float smash_y = 1.0f;
     float beziert = 0.0f;
+    float beziert_bola = 0.0f;
     float beziert_2 = 0.0f;
     bool way_back = false;
     bool way_back2 = false;
+    bool way_back_bola = false;
     float spin = 0;
-    
+    int count_enemies=0;
+    glm::vec3 makima_bbox_min = g_VirtualScene["makima_plushie"].bbox_min;
+    glm::vec3 makima_bbox_max = g_VirtualScene["makima_plushie"].bbox_max;
+    glm::mat4 last_bola_model;
 
     //iniloop
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
+        int count_objects=0;
         // Aqui executamos as operações de renderização
 
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -615,21 +629,12 @@ int main(int argc, char* argv[])
         float raio_lua = abs(farplane) - 5;
         float lua_escala = 5.0f;
         float moon_speed = 0.01f;
-        if(!smash){
-            model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
-              * Matrix_Translate(-raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
-              * Matrix_Rotate_Y(spin/3)    
-              * Matrix_Scale(lua_escala, lua_escala, lua_escala)
-              * Matrix_Rotate_Z(3.1415);
-        }
-        else{
-            model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
-                * Matrix_Translate(-raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
-                * Matrix_Rotate_Z(spin * 10)
-                * Matrix_Rotate_Y(spin/3)    
-                * Matrix_Scale(lua_escala, lua_escala/smash_y, lua_escala)
-                * Matrix_Rotate_Z(3.1415);
-        }
+        model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
+            * Matrix_Translate(-raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
+            * Matrix_Rotate_Y(spin/3)    
+            * Matrix_Scale(lua_escala, lua_escala, lua_escala)
+            * Matrix_Rotate_Z(3.1415);
+
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, MOON);
         DrawVirtualObject("the_sphere");
@@ -675,25 +680,64 @@ int main(int argc, char* argv[])
             }
         }
 
+        bezier_speed2 = 0.05f;
+        if(beziert_bola < 1.0f && !way_back_bola)
+            beziert_bola += delta_t * bezier_speed2;
+        else{
+            way_back_bola = true;
+            beziert_bola -= delta_t * bezier_speed2;
+            if(beziert_bola<=0 && way_back_bola){
+                way_back_bola = false;
+                beziert_bola = 0;
+            }
+        }
+
         bezier_p1 = glm::vec4(0.0f,1.0f,50.0f,1.0f);
         bezier_p2 = glm::vec4(50.0f,1.0f,50.0f,1.0f);
         bezier_p3 = glm::vec4(50.0f,1.0f,-50.0f,1.0f);
         bezier_p4 = glm::vec4(0.0f,1.0f,-50.0f,1.0f); 
         glm::vec4 bezier_c;
 
-        bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert_2);
+        bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert_bola);
 
         model = Matrix_Translate(bezier_c.x , bezier_c.y + 1, bezier_c.z)
-              * Matrix_Rotate_X(-beziert_2 * 20)
-              * Matrix_Rotate_Y(-beziert_2 )
+              * Matrix_Rotate_X(-beziert_bola * 20)
+              * Matrix_Rotate_Y(-beziert_bola )
               * Matrix_Scale(3.0f,3.0f/smash_y,3.0f);
-        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, SPHERE);
-        DrawVirtualObject("the_sphere");
-
+        
+            Object_type object_ins;
+            object_ins.id = count_objects;
+            // if (not collision)
+            object_ins.collision = false;
+            //else
+            // object_ins.collision = true;
+            object_vector.insert(object_vector.begin() + count_objects, object_ins);
+            count_objects++;
+            object_ins.bbox_min = g_VirtualScene["the_sphere"].bbox_min * glm::vec3(3.0f,3.0f/smash_y,3.0f);
+            object_ins.bbox_max = g_VirtualScene["the_sphere"].bbox_max * glm::vec3(3.0f,3.0f/smash_y,3.0f);
+            object_ins.bbox_max = object_ins.bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
+            object_ins.bbox_min = object_ins.bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
+            // object_ins.id = count_objects;
+            if (!BoxCollision(makima_bbox_min, makima_bbox_max, object_ins.bbox_min, object_ins.bbox_max)){
+                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(g_object_id_uniform, SPHERE);
+                DrawVirtualObject("the_sphere");
+                object_ins.collision = false;
+            }
+            else{
+                model = last_bola_model;
+                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(g_object_id_uniform, SPHERE);
+                DrawVirtualObject("the_sphere");
+                printf("COllision happening with tree");
+                way_back_bola = !way_back_bola;
+            }
+        last_bola_model = model;
         spin += delta_t;
         rasterization_type = 1;
         glUniform1i(g_rasterization_type_uniform, rasterization_type);
+
+
          // Desenhamos o modelo da esfera
         model = Matrix_Translate(-20,2,4)
               * Matrix_Scale(3.0f,3.0f,3.0f)
@@ -702,7 +746,13 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
-
+        object_ins.id = count_objects;
+        // if (not collision)
+        object_ins.collision = false;
+        //else
+        // object_ins.collision = true;
+        object_vector.insert(object_vector.begin() + count_objects, object_ins);
+        count_objects++;
 
         rasterization_type = 0;
         glUniform1i(g_rasterization_type_uniform, rasterization_type);
@@ -712,10 +762,15 @@ int main(int argc, char* argv[])
         model = Matrix_Translate(-20,2,-4)
               * Matrix_Scale(3.0f,3.0f,3.0f)
               * Matrix_Rotate_X(spin);
-           //  intersection_hitbox(camera_position_c, camera_view_vector, spheremodel.bbox_min, spheremodel.bbox_max);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
+        // if (not collision)
+        object_ins.collision = false;
+        //else
+        // object_ins.collision = true;
+        object_vector.insert(object_vector.begin() + count_objects, object_ins);
+        count_objects++;
 
 
 
@@ -739,39 +794,76 @@ int main(int argc, char* argv[])
             smash_y = 1.0f;         
             toggle_G = !toggle_G;
         }
+
+
         float tree_center = 20;
         float tree_distance= 10;
-         // Desenhamos o modelo do inimigo
+         // Desenhamos o modelo da tree
          for(int i = 0; i < 3; i++){
             for(int l = 0; l < 3; l++){
                 srand(i+l*10);
+                float rnn = (rand()%2 + 1);
                 float tree_scale = rand()%3 + 2;
                 model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0))
-                      * Matrix_Scale(0.5f *tree_scale +(rand()%2 + 1)/3, tree_scale* 0.5f, 0.5f *tree_scale+(rand()%2 + 1)/3); 
+                      * Matrix_Scale(0.5f *tree_scale +rnn/3, tree_scale* 0.5f, 0.5f *tree_scale+rnn/3); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, TREEBARK);
                 DrawVirtualObject("tree_bark");
                 glUniform1i(g_object_id_uniform, TREELEAF);
                 DrawVirtualObject("tree_leaf");
+                
+
+                object_ins.collision = false;
+                //else
+                // object_ins.collision = true;
+                object_vector.insert(object_vector.begin() + count_objects, object_ins);
+                count_objects++;
             }
         }
 
-        bezier_p1 = glm::vec4(1.0f,0.0f,0.0f,1.0f);
-        bezier_p2 = glm::vec4(1.0f,0.0f,5.0f,1.0f);
-        bezier_p3 = glm::vec4(-1.0f,0.0f,-5.0f,1.0f);
-        bezier_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);  
-
-        bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert);
              // Desenhamos o modelo do inimigo
+        count_enemies = 0;
         for(int i = 0; i < 2; i++){
             for(int l = 0; l < 2; l++){
-                model = Matrix_Translate(((l*8) - 14.0f) + bezier_c.x,-1.0f ,  bezier_c.z + ((i*12) - 8.0)) 
+                model = Matrix_Translate(((l*8) - 14.0f),-1.0f , ((i*12) - 8.0)) 
                       * Matrix_Scale(5.0f,5.0f/smash_y,5.0f); 
+                Enemy_type enemy_ins;
+                enemy_ins.id = count_enemies;
+                // if(collision cameravector, enemy)
+                // enemy_ins.smash = true;
+                //else
+                enemy_ins.smash = false;
+                enemy_vector.insert(enemy_vector.begin() + count_enemies, enemy_ins);
+                count_enemies++;
+                enemy_ins.id = count_objects;
+                // if (not collision)
+                //enemy_ins.collision = false;
+                //else
+                // enemy_ins.collision = true;
                 
-                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                enemy_ins.bbox_min = g_VirtualScene["garden_gnome"].bbox_min * glm::vec3(5.0f,5.0f/smash_y,5.0f);
+                enemy_ins.bbox_max = g_VirtualScene["garden_gnome"].bbox_max * glm::vec3(5.0f,5.0f/smash_y,5.0f);
+                enemy_ins.bbox_max = enemy_ins.bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
+                enemy_ins.bbox_min = enemy_ins.bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
+               // enemy_ins.id = count_objects;
+                glm::vec3 tree_center = glm::vec3(model[3][0], model[3][1], model[3][2]);
+                
+                if(!BoxCollision(makima_bbox_min, makima_bbox_max, enemy_ins.bbox_min, enemy_ins.bbox_max)){
+                    glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, GNOME);
                 DrawVirtualObject("garden_gnome");
+                }
+                else{
+                    glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(g_object_id_uniform, GNOME);
+                DrawVirtualObject("garden_gnome");
+                    printf("COllision happening with tree");
+                }
+                
+                object_vector.insert(object_vector.begin() + count_objects, object_ins);
+                count_objects++;
+                
 
             }
         }
@@ -785,19 +877,27 @@ int main(int argc, char* argv[])
 
         model = Matrix_Translate( -30 + bezier_c.x,-1.0f ,  bezier_c.z + -30 ) 
              * Matrix_Rotate_Y(spin * 10)
-              * Matrix_Scale(5.0f,5.0f/smash_y,5.0f)
-              ; 
+              * Matrix_Scale(5.0f,5.0f/smash_y,5.0f); 
+
+             
         
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, GNOME);
         DrawVirtualObject("garden_gnome");
+        object_ins.id = count_objects;
+        // if (not collision)
+        object_ins.collision = false;
+        //else
+        // object_ins.collision = true;
+        object_vector.insert(object_vector.begin() + count_objects, object_ins);
+        count_objects++;
 
 
         //create last cam posix
         // Desenhamos o modelo da makima
         if(!toggle_V){
             model = Matrix_Translate(camera_position_c.x+1,camera_position_c.y-0.8,camera_position_c.z+0.3) * 
-            Matrix_Translate(-camera_view_vector.x, 0, -camera_view_vector.z);
+            Matrix_Translate(-1, 0, 0);
 
         // moves makima with cursor
             last_cam_pos = camera_position_c;
@@ -807,6 +907,8 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, MAKIMA);
         DrawVirtualObject("makima_plushie");
+        makima_bbox_min = g_VirtualScene["makima_plushie"].bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
+        makima_bbox_max = g_VirtualScene["makima_plushie"].bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
 
         
         // Desenhamos o plano do chão

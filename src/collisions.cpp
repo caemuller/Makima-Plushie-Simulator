@@ -1,26 +1,3 @@
-// bool intersection_hitsphere(glm::vec4 pos,glm::vec4 aim, glm::vec4 model_center, float far){
-//     float r = 10;
-//     float A = norm(aim) * norm(aim);
-//     float B = 2 * dot(aim, (pos - model_center));
-//     float C = norm(pos - model_center) * norm(pos - model_center) - r;
-
-//     float t;
-//     if(0 == t*t*A + t*B + C){
-//         return true;
-//     }
-//     else{
-//         return false;
-//     }
-// }
-
-// bool intersection_raio(glm::vec4 obj_a, glm::vec4 obj_b, float raio_a, float raio_b){
-//     if(norm(obj_a - obj_b) <= (raio_a + raio_b)){
-//         return true;
-//     }
-//     else{
-//         return false;
-//     }
-
 
 float max3(float v1, float v2, float v3){
     if(v1 < 0)
@@ -43,16 +20,12 @@ float max3(float v1, float v2, float v3){
     }
 }
 
-bool CheckCollision(const glm::vec3 bbox1min, const glm::vec3 bbox1max, const glm::vec3 bbox2min, const glm::vec3 bbox2max) {
+bool BoxCollision(const glm::vec3 bbox1min, const glm::vec3 bbox1max, const glm::vec3 bbox2min, const glm::vec3 bbox2max) {
 
-    // Collision x-axis?
     bool collisionX = bbox1max.x >= bbox2min.x && bbox2max.x >= bbox1min.x;
-    // Collision y-axis?
     bool collisionY = bbox1max.y >= bbox2min.y && bbox2max.y >= bbox1min.y;
-    // Collision z-axis?
     bool collisionZ = bbox1max.z >= bbox2min.z && bbox2max.z >= bbox1min.z;
 
-    // Collisions occur only if there's overlap along all three axes
     return collisionX && collisionY && collisionZ;
 }
 
@@ -104,6 +77,26 @@ bool CheckCillinderCollision(const glm::vec3 bbox1min, const glm::vec3 bbox1max,
     bool condition3 = (center_cillinder1.z - center_cillinder2.z) <= (radius1 + radius2);
 
     if(condition1 && condition2 && condition3){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool CheckCillinderCollisionTree(const glm::vec3 bbox1min, const glm::vec3 bbox1max, const glm::vec3 center_tree, const float radius_tree) {
+    float meanx1 = (bbox1min.x + bbox1max.x)/2;
+    float meany1 = (bbox1min.y + bbox1max.y)/2;
+    float meanz1 = (bbox1min.z + bbox1max.z)/2;
+
+    glm::vec3 center_cillinder1 = glm::vec3(meanx1, meany1, meanz1);
+
+    float radius1 = max3(bbox1max.x - bbox1min.x, bbox1max.z - bbox1min.z, 0);
+
+    bool condition1 = (center_cillinder1.x - center_tree.x) <= (radius1 + radius_tree);
+    bool condition3 = (center_cillinder1.z - center_tree.z) <= (radius1 + radius_tree);
+
+    if(condition1  && condition3){
         return true;
     }
     else{
