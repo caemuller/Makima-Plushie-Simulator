@@ -56,11 +56,12 @@ Aplicação dos conceitos de computação gráfica:
 
 Manual do Makima plushie simulator(MAKIMA SMASH):
 Interações:
-W,S,A,D: utilizados para movimentação do personagem(camera).
-E: SMASH.
-1: Habilita o crosshair.
-V: Trocar entre camera look-at e free-view.
-P, O: trocam entre as projeções(herança do laboratório, e buga a skysphere).
+- W,S,A,D: utilizados para movimentação do personagem(camera).
+- E: SMASH.
+- 1: Habilita o crosshair.
+- V: Trocar entre camera look-at e free-view.
+- P, O: trocam entre as projeções(herança do laboratório, e buga a skysphere).
+
 
 Jogo:
 O objetivo do jogo eh AMASSAR os gnomos. Acompanhado de uma ambientação ABSURDA. E com umas bolinhas amigas
