@@ -23,9 +23,8 @@ Repo for our project :heart:
 
 Contribuições
 Caetano: 
-- Malhas poligonais complexas
+- Malhas poligonais complexas - gnomo
 - Câmera livre e câmera look-at
-- Instâncias de objetos
 - Modelos de Iluminação Difusa e Blinn-Phong
 - Mapeamento de texturas em todos os objetos
 - Animações baseadas no tempo ($\Delta t$)
@@ -33,7 +32,7 @@ Caetano:
  
 Victor:
 - Modelos de Interpolação de Phong e Gouraud
-- Transformações geométricas controlada pelo usuário
+- Transformações geométricas controlada pelo usuário - SMASH
 - Mapeamento de texturas em todos os objetos
 - Movimentação com curva Bézier cúbica
 - Animações baseadas no tempo ($\Delta t$)
