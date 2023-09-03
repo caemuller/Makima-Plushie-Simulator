@@ -682,9 +682,6 @@ int main(int argc, char* argv[])
         glm::vec4 bezier_c;
 
         bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert_2);
-        
-       
-       
 
         model = Matrix_Translate(bezier_c.x , bezier_c.y + 1, bezier_c.z)
               * Matrix_Rotate_X(-beziert_2 * 20)
@@ -787,8 +784,9 @@ int main(int argc, char* argv[])
         bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert_2);
 
         model = Matrix_Translate( -30 + bezier_c.x,-1.0f ,  bezier_c.z + -30 ) 
+             * Matrix_Rotate_Y(spin * 10)
               * Matrix_Scale(5.0f,5.0f/smash_y,5.0f)
-              *Matrix_Rotate_Y(spin * 10); 
+              ; 
         
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, GNOME);
