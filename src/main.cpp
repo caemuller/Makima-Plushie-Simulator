@@ -717,13 +717,17 @@ int main(int argc, char* argv[])
             object_ins.bbox_max = g_VirtualScene["the_sphere"].bbox_max * glm::vec3(3.0f,3.0f/smash_y,3.0f);
             object_ins.bbox_max = object_ins.bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
             object_ins.bbox_min = object_ins.bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
+
+            glm::vec3 aim = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z) + glm::vec3(camera_view_vector.x * 3, camera_view_vector.y * 3, camera_view_vector.z * 3);
+            glm::vec3 pos = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z);
             // object_ins.id = count_objects;
-            if (!BoxCollision(makima_bbox_min, makima_bbox_max, object_ins.bbox_min, object_ins.bbox_max)){
+            if (!BoxCollision(pos, aim, object_ins.bbox_min, object_ins.bbox_max)){
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, SPHERE);
                 DrawVirtualObject("the_sphere");
                 object_ins.collision = false;
             }
+            
             else{
                 model = last_bola_model;
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
@@ -848,7 +852,9 @@ int main(int argc, char* argv[])
                 enemy_ins.bbox_min = enemy_ins.bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
                // enemy_ins.id = count_objects;
                 glm::vec3 tree_center = glm::vec3(model[3][0], model[3][1], model[3][2]);
-                
+                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(g_object_id_uniform, GNOME);
+                DrawVirtualObject("garden_gnome");
                 if(!BoxCollision(makima_bbox_min, makima_bbox_max, enemy_ins.bbox_min, enemy_ins.bbox_max)){
                     glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, GNOME);
@@ -868,7 +874,7 @@ int main(int argc, char* argv[])
             }
         }
 
-         bezier_p1 = glm::vec4(20.0f,0.0f,0.0f,1.0f);
+        bezier_p1 = glm::vec4(20.0f,0.0f,0.0f,1.0f);
         bezier_p2 = glm::vec4(0.0f,0.0f,20.0f,1.0f);
         bezier_p3 = glm::vec4(0.0f,0.0f,-20.0f,1.0f);
         bezier_p4 = glm::vec4(-20.0f,0.0f,-0.0f,1.0f);  
