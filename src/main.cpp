@@ -419,6 +419,7 @@ int main(int argc, char* argv[])
     bool way_back = false;
     bool way_back2 = false;
     float spin = 0;
+    
 
     //iniloop
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
@@ -610,13 +611,25 @@ int main(int argc, char* argv[])
         }
 
 
-        // Desenhamos o modelo da esfera
-        float raio_lua = abs(farplane);
+        // Desenhamos o modelo da lua
+        float raio_lua = abs(farplane) - 5;
         float lua_escala = 5.0f;
-        float moon_speed = 0.02f;
-        model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
+        float moon_speed = 0.01f;
+        if(!smash){
+            model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
               * Matrix_Translate(-raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
-              * Matrix_Scale(lua_escala, lua_escala, lua_escala);
+              * Matrix_Rotate_Y(spin/3)    
+              * Matrix_Scale(lua_escala, lua_escala, lua_escala)
+              * Matrix_Rotate_Z(3.1415);
+        }
+        else{
+            model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
+                * Matrix_Translate(-raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
+                * Matrix_Rotate_Z(spin * 10)
+                * Matrix_Rotate_Y(spin/3)    
+                * Matrix_Scale(lua_escala, lua_escala/smash_y, lua_escala)
+                * Matrix_Rotate_Z(3.1415);
+        }
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, MOON);
         DrawVirtualObject("the_sphere");
@@ -674,9 +687,9 @@ int main(int argc, char* argv[])
        
 
         model = Matrix_Translate(bezier_c.x , bezier_c.y + 1, bezier_c.z)
-              * Matrix_Scale(3.0f,3.0f,3.0f)
               * Matrix_Rotate_X(-beziert_2 * 20)
-              * Matrix_Rotate_Z(-beziert_2 * 20);
+              * Matrix_Rotate_Y(-beziert_2 )
+              * Matrix_Scale(3.0f,3.0f/smash_y,3.0f);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
@@ -734,8 +747,10 @@ int main(int argc, char* argv[])
          // Desenhamos o modelo do inimigo
          for(int i = 0; i < 3; i++){
             for(int l = 0; l < 3; l++){
-                model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0));
-                    //   * Matrix_Scale(0.5f,0.5f/smash_y,0.5f); 
+                srand(i+l*10);
+                float tree_scale = rand()%3 + 2;
+                model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0))
+                      * Matrix_Scale(0.5f *tree_scale +(rand()%2 + 1)/3, tree_scale* 0.5f, 0.5f *tree_scale+(rand()%2 + 1)/3); 
 
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, TREEBARK);
@@ -756,13 +771,28 @@ int main(int argc, char* argv[])
             for(int l = 0; l < 2; l++){
                 model = Matrix_Translate(((l*8) - 14.0f) + bezier_c.x,-1.0f ,  bezier_c.z + ((i*12) - 8.0)) 
                       * Matrix_Scale(5.0f,5.0f/smash_y,5.0f); 
-
+                
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, GNOME);
                 DrawVirtualObject("garden_gnome");
 
             }
         }
+
+         bezier_p1 = glm::vec4(20.0f,0.0f,0.0f,1.0f);
+        bezier_p2 = glm::vec4(0.0f,0.0f,20.0f,1.0f);
+        bezier_p3 = glm::vec4(0.0f,0.0f,-20.0f,1.0f);
+        bezier_p4 = glm::vec4(-20.0f,0.0f,-0.0f,1.0f);  
+
+        bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert_2);
+
+        model = Matrix_Translate( -30 + bezier_c.x,-1.0f ,  bezier_c.z + -30 ) 
+              * Matrix_Scale(5.0f,5.0f/smash_y,5.0f)
+              *Matrix_Rotate_Y(spin * 10); 
+        
+        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, GNOME);
+        DrawVirtualObject("garden_gnome");
 
 
         //create last cam posix
