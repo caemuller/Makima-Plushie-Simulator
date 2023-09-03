@@ -198,6 +198,7 @@ struct SceneObject
 struct Enemy_type{
     bool smash;
     int id;
+    float smash_y;
     glm::vec3 bbox_min;
     glm::vec3 bbox_max;
 };
@@ -421,6 +422,7 @@ int main(int argc, char* argv[])
     glm::vec4 last_cam_pos = camera_position_c;
     
     bool smash = false;
+    bool fst_time = true;
     float smash_y = 1.0f;
     float beziert = 0.0f;
     float beziert_bola = 0.0f;
@@ -777,21 +779,14 @@ int main(int argc, char* argv[])
         
         int smash_speed = 10;
         
-        //smash on
-        if (toggle_E)
-        {        
-            smash = true;
-            toggle_E = !toggle_E;
-        }
-        //smash
-        if(smash && (smash_y < 40.0f))
-        {
-            smash_y += delta_t * smash_speed;
-        }
         //fim smash
         if(toggle_G){
-            smash = false;
-            smash_y = 1.0f;         
+            // smash = false;
+            // smash_y = 1.0f;         
+            for(int idx=0;idx<enemy_vector.size();idx++){
+                enemy_vector.at(idx).smash = false;
+                enemy_vector.at(idx).smash_y = 1.0f;
+            }
             toggle_G = !toggle_G;
         }
 
@@ -826,49 +821,66 @@ int main(int argc, char* argv[])
         count_enemies = 0;
         for(int i = 0; i < 2; i++){
             for(int l = 0; l < 2; l++){
-                model = Matrix_Translate(((l*8) - 14.0f),-1.0f , ((i*12) - 8.0)) 
-                      * Matrix_Scale(5.0f,5.0f/smash_y,5.0f); 
-                Enemy_type enemy_ins;
-                enemy_ins.id = count_enemies;
-                // if(collision cameravector, enemy)
-                // enemy_ins.smash = true;
-                //else
-                enemy_ins.smash = false;
-                enemy_vector.insert(enemy_vector.begin() + count_enemies, enemy_ins);
-                count_enemies++;
-                enemy_ins.id = count_objects;
+                if(fst_time){
+                    Enemy_type enemy_ins;
+                    enemy_ins.id = count_enemies;
+                    enemy_ins.smash = false;
+                    enemy_ins.smash_y = 1.0f;
+                    enemy_vector.insert(enemy_vector.begin() + count_enemies, enemy_ins);
+
+                }
+                 model = Matrix_Translate(((l*8) - 14.0f),-1.0f , ((i*12) - 8.0)) 
+                      * Matrix_Scale(5.0f,5.0f / enemy_vector.at(count_enemies).smash_y,5.0f);
+                enemy_vector.at(count_enemies).bbox_min = g_VirtualScene["garden_gnome"].bbox_min * glm::vec3(5.0f,5.0f/enemy_vector.at(count_enemies).smash_y,5.0f);
+                enemy_vector.at(count_enemies).bbox_max = g_VirtualScene["garden_gnome"].bbox_max * glm::vec3(5.0f,5.0f/enemy_vector.at(count_enemies).smash_y,5.0f);
+                enemy_vector.at(count_enemies).bbox_max = enemy_vector.at(count_enemies).bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
+                enemy_vector.at(count_enemies).bbox_min = enemy_vector.at(count_enemies).bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
                 // if (not collision)
                 //enemy_ins.collision = false;
                 //else
                 // enemy_ins.collision = true;
                 
-                enemy_ins.bbox_min = g_VirtualScene["garden_gnome"].bbox_min * glm::vec3(5.0f,5.0f/smash_y,5.0f);
-                enemy_ins.bbox_max = g_VirtualScene["garden_gnome"].bbox_max * glm::vec3(5.0f,5.0f/smash_y,5.0f);
-                enemy_ins.bbox_max = enemy_ins.bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
-                enemy_ins.bbox_min = enemy_ins.bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
                // enemy_ins.id = count_objects;
-                glm::vec3 tree_center = glm::vec3(model[3][0], model[3][1], model[3][2]);
+               glm::vec3 aux_view = glm::vec3(camera_view_vector.x*10, camera_view_vector.y, camera_view_vector.z*10);
+               glm::vec3 aux_pos = glm::vec3(camera_position_c.x-2, camera_position_c.y-1, camera_position_c.z+1);
+                if(BoxCollision(makima_bbox_min, makima_bbox_max, enemy_vector.at(count_enemies).bbox_min, enemy_vector.at(count_enemies).bbox_max)){
+                    printf("HIT DAT GNOME");
+                    enemy_vector.at(count_enemies).smash = true;
+                    // toggle_E = !toggle_E;
+                }
+
+                if(enemy_vector.at(count_enemies).smash && (enemy_vector.at(count_enemies).smash_y < 40.0f)){
+                    model = Matrix_Translate(((l*8) - 14.0f),-1.0f , ((i*12) - 8.0)) 
+                      * Matrix_Scale(5.0f,5.0f / enemy_vector.at(count_enemies).smash_y,5.0f);
+                    enemy_vector.at(count_enemies).smash_y += delta_t * smash_speed;
+                }
+                else{
+                    model = Matrix_Translate(((l*8) - 14.0f),-1.0f , ((i*12) - 8.0)) 
+                      * Matrix_Scale(5.0f,5.0f/enemy_vector.at(count_enemies).smash_y,5.0f);
+                }
                 
-                if(!BoxCollision(makima_bbox_min, makima_bbox_max, enemy_ins.bbox_min, enemy_ins.bbox_max)){
+                if(!BoxCollision(makima_bbox_min, makima_bbox_max, enemy_vector.at(count_enemies).bbox_min, enemy_vector.at(count_enemies).bbox_max)){
                     glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-                glUniform1i(g_object_id_uniform, GNOME);
-                DrawVirtualObject("garden_gnome");
+                    glUniform1i(g_object_id_uniform, GNOME);
+                    DrawVirtualObject("garden_gnome");
                 }
                 else{
                     glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-                glUniform1i(g_object_id_uniform, GNOME);
-                DrawVirtualObject("garden_gnome");
-                    printf("COllision happening with tree");
+                    glUniform1i(g_object_id_uniform, GNOME);
+                    DrawVirtualObject("garden_gnome");
+                    glm::vec4 aux = glm::vec4(camera_view_vector.x*0.01, 0, camera_view_vector.z*0.01, 0.0f);
+                    camera_position_c = last_cam_pos - aux;
+                    camera_position_c.y = last_cam_pos.y;
                 }
-                
+
                 object_vector.insert(object_vector.begin() + count_objects, object_ins);
                 count_objects++;
-                
-
+                count_enemies++;
             }
         }
+        fst_time = false;
 
-         bezier_p1 = glm::vec4(20.0f,0.0f,0.0f,1.0f);
+        bezier_p1 = glm::vec4(20.0f,0.0f,0.0f,1.0f);
         bezier_p2 = glm::vec4(0.0f,0.0f,20.0f,1.0f);
         bezier_p3 = glm::vec4(0.0f,0.0f,-20.0f,1.0f);
         bezier_p4 = glm::vec4(-20.0f,0.0f,-0.0f,1.0f);  
