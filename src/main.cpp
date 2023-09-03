@@ -688,7 +688,7 @@ int main(int argc, char* argv[])
 
         model = Matrix_Translate(bezier_c.x , bezier_c.y + 1, bezier_c.z)
               * Matrix_Rotate_X(-beziert_2 * 20)
-              * Matrix_Rotate_Y(beziert_2)
+              * Matrix_Rotate_Y(-beziert_2 )
               * Matrix_Scale(3.0f,3.0f/smash_y,3.0f);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
