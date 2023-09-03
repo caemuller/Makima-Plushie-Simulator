@@ -810,6 +810,7 @@ int main(int argc, char* argv[])
         glUniform1i(g_object_id_uniform, MAKIMA);
         DrawVirtualObject("makima_plushie");
 
+        
         // Desenhamos o plano do chão
         model = Matrix_Translate(0.0f,-1.1f,0.0f)
                 * Matrix_Scale(100.0f,0.001f,100.0f);
