@@ -124,7 +124,6 @@ void main()
         float theta = atan(p_v.x, p_v.z) + epsilon;
         float phi = asin(p_v.y/11) + epsilon;; 
 
-        Ks = vec3(0.2,0.2,0.2);
         q = 1.0;
         
 
@@ -135,43 +134,34 @@ void main()
         
         Kd0 = texture(TextureImage4, vec2(U,V)).rgb;
         
-        Ka = Kd0 / 2.0f;
+      Ka = vec3(0.1, 0.1, 0.1);
+     Ks = vec3(0.6, 0.6, 0.6);
         
         
         
     }
     else if ( object_id == TREELEAF)
     {
-        // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
-        // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
-        // o slides 134-150 do documento Aula_20_Mapeamento_de_Texturas.pdf.
-        // A esfera que define a projeção deve estar centrada na posição
-        // "bbox_center" definida abaixo.
+        float minx = bbox_min.x;
+        float maxx = bbox_max.x;
 
-        // Você deve utilizar:
-        //   função 'length( )' : comprimento Euclidiano de um vetor
-        //   função 'atan( , )' : arcotangente. Veja https://en.wikipedia.org/wiki/Atan2.
-        //   função 'asin( )'   : seno inverso.
-        //   constante M_PI
-        //   variável position_model
+        float miny = bbox_min.y;
+        float maxy = bbox_max.y;
 
-        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
-        
-        vec4 p_l = bbox_center + 11* ((position_model - bbox_center)/(length(position_model - bbox_center)));
-        vec4 p_v = p_l - bbox_center;        
+        float minz = bbox_min.z;
+        float maxz = bbox_max.z;
 
-        
-        float theta = atan(p_v.x, p_v.z) + epsilon;
-        float phi = asin(p_v.y/11) + epsilon;; 
+        float X = (position_model.x - bbox_min.x)/(bbox_max.x - bbox_min.x);
+        float Y = (position_model.y - bbox_min.y)/(bbox_max.y - bbox_min.y);
 
-        Ks = vec3(0.2,0.2,0.2);
-        q = 1.0;
-        
+        Ks = vec3(0.3,0.3,0.3);
+        Ka = vec3(0.2,0.2,0.2);
+        q = 20.0;
 
-        U = (theta + M_PI)/(2*M_PI);        
-        V = (phi + (M_PI_2))/(M_PI);
+        U = X;
+        V = Y;
         // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        Kd0 = texture(camo_green, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
         Ka = Kd0 / 2.0f;
         
         
@@ -317,7 +307,7 @@ void main()
 
     if(rasterization_type == 0){
 
-    Kd = vec3(0.3, 0.3, 0.3);
+    Kd = vec3(0.1, 0.1, 0.1);
     // Espectro da fonte de iluminação
    
     vec3 I = vec3(1.0,1.0,1.0);

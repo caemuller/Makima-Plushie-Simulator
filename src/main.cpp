@@ -346,11 +346,11 @@ int main(int argc, char* argv[])
 
     // Carregamos duas imagens para serem utilizadas como textura
     LoadTextureImage("../../data/textures/mud_road_puresky_2k.hdr");       // TextureImage0
-    LoadTextureImage("../../data/textures/chess.png");  // TextureImage1
+    LoadTextureImage("../../data/textures/redleaves.png");  // TextureImage1
     LoadTextureImage("../../data/textures/concrete_wall_003_diff_4k.jpg");       // TextureImage2
     LoadTextureImage("../../data/textures/winter_leaves_diff_4k.jpg");       // TextureImage3
-    LoadTextureImage("../../data/textures/133e153db52855f1394726a65ff7ef92.jpg"); //4
-    LoadTextureImage("../../data/textures/camobrown.jpg");//5
+    LoadTextureImage("../../data/textures/chess.png"); //4
+    LoadTextureImage("../../data/textures/bark_willow_diff_4k.jpg");//5
     LoadTextureImage("../../data/textures/makimaovotextura.png");//6
     LoadTextureImage("../../data/textures/gnome_texture.jpg");//7
 
@@ -403,7 +403,7 @@ int main(int argc, char* argv[])
     float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
 
     glm::vec4 camera_position_c  = glm::vec4(3,3,3 ,1.0f);
-    float speed = 2.5f; // Velocidade da câmera
+    float speed = 4.5f; // Velocidade da câmera
     float prev_time = (float)glfwGetTime();
     
     camera_position_c  = glm::vec4(x,y+1,z,1.0f); // Ponto "c", centro da câmera
@@ -416,6 +416,7 @@ int main(int argc, char* argv[])
     float smash_y = 1.0f;
     float beziert = 0.0f;
     bool way_back = false;
+    float spin = 0;
 
     //iniloop
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
@@ -628,7 +629,7 @@ int main(int argc, char* argv[])
         // } else{
         //     beziert = 0.0f;
         // }
-        int bezier_speed = 0.8f;
+        int bezier_speed = 1.0f;
         if(beziert < 1.0f && !way_back)
             beziert += delta_t * bezier_speed;
         else{
@@ -642,25 +643,36 @@ int main(int argc, char* argv[])
 
         // printf("bezier: %f", beziert);
         glm::vec4 bezier_p1 = glm::vec4(1.0f,0.0f,0.0f,1.0f);
-        glm::vec4 bezier_p2 = glm::vec4(1.0f,0.0f,1.0f,1.0f);
-        glm::vec4 bezier_p3 = glm::vec4(-1.0f,0.0f,1.0f,1.0f);
+        glm::vec4 bezier_p2 = glm::vec4(1.0f,0.0f,5.0f,1.0f);
+        glm::vec4 bezier_p3 = glm::vec4(-1.0f,0.0f,-5.0f,1.0f);
         glm::vec4 bezier_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);        
        
         glm::vec4 bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert);
-        
+        spin += delta_t;
         rasterization_type = 1;
         glUniform1i(g_rasterization_type_uniform, rasterization_type);
          // Desenhamos o modelo da esfera
-        model = Matrix_Translate(bezier_c.x,bezier_c.y,bezier_c.z)
-              * Matrix_Scale(2.0f,2.0f,2.0f)
-              * Matrix_Rotate_Y(delta_t);
-             // intersection_hitbox(camera_position_c, camera_view_vector, spheremodel.bbox_min,spheremodel.bbox_max);
+        model = Matrix_Translate(-20,2,4)
+              * Matrix_Scale(3.0f,3.0f,3.0f)
+              * Matrix_Rotate_Y(spin);
+           //  intersection_hitbox(camera_position_c, camera_view_vector, spheremodel.bbox_min, spheremodel.bbox_max);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
 
+
         rasterization_type = 0;
         glUniform1i(g_rasterization_type_uniform, rasterization_type);
+
+        glUniform1i(g_rasterization_type_uniform, rasterization_type);
+         // Desenhamos o modelo da esfera
+        model = Matrix_Translate(-20,2,-4)
+              * Matrix_Scale(3.0f,3.0f,3.0f)
+              * Matrix_Rotate_X(spin);
+           //  intersection_hitbox(camera_position_c, camera_view_vector, spheremodel.bbox_min, spheremodel.bbox_max);
+        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, SPHERE);
+        DrawVirtualObject("the_sphere");
 
         
         int smash_speed = 10;

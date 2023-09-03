@@ -69,7 +69,7 @@ void main()
     texcoords = texture_coefficients;
 
     
-    //rasterizado
+    //interpolação gourad
     
     if(rasterization_type == 1)
     {
@@ -82,9 +82,9 @@ void main()
     vec4 r = normalize(-l + 2 * n * dot(n, l));
     float q = 1.0; // Expoente especular para o modelo de iluminação de Phong
    
-    vec3 Kd = vec3(0.4, 0.4, 0.4);
-    vec3 Ka = vec3(0.3, 0.3, 0.3);
-    vec3 Ks = vec3(1.0, 1.0, 1.0);
+    vec3 Kd = vec3(0.1, 0.1, 0.1);
+    vec3 Ka = vec3(0.1, 0.1, 0.1);
+    vec3 Ks = vec3(0.6, 0.6, 0.6);
     vec3 I = vec3(1.0,1.0,1.0);
     if(light_source.y < 0) {
         if(1/(-light_source.y) >= 0){
