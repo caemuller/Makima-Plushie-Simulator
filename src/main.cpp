@@ -47,7 +47,7 @@
 // Headers locais, definidos na pasta "include/"
 #include "utils.h"
 #include "matrices.h"
-//#include "collisions.cpp"
+#include "collisions.cpp"
 
 
 // Desenhamos os objetos da cena virtual
