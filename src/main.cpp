@@ -614,11 +614,13 @@ int main(int argc, char* argv[])
         // Desenhamos o modelo da esfera
         float raio_lua = abs(farplane) - 5;
         float lua_escala = 5.0f;
-        float moon_speed = 0.02f;
+        float moon_speed = 0.01f;
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
               * Matrix_Translate(-raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
               * Matrix_Rotate_Z(smash_y)
-              * Matrix_Scale(lua_escala, lua_escala/smash_y, lua_escala);
+              * Matrix_Rotate_Y(spin/3)    
+              * Matrix_Scale(lua_escala, lua_escala/smash_y, lua_escala)
+              * Matrix_Rotate_Z(3.1415);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, MOON);
         DrawVirtualObject("the_sphere");
