@@ -47,7 +47,7 @@
 // Headers locais, definidos na pasta "include/"
 #include "utils.h"
 #include "matrices.h"
-#include "collisions.cpp"
+//#include "collisions.cpp"
 
 
 // Desenhamos os objetos da cena virtual
@@ -289,10 +289,6 @@ int main(int argc, char* argv[])
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    print2();
-    print2();
-    print2();
-    print2();
     #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
@@ -419,7 +415,9 @@ int main(int argc, char* argv[])
     bool smash = false;
     float smash_y = 1.0f;
     float beziert = 0.0f;
+    float beziert_2 = 0.0f;
     bool way_back = false;
+    bool way_back2 = false;
     float spin = 0;
 
     //iniloop
@@ -617,7 +615,7 @@ int main(int argc, char* argv[])
         float lua_escala = 5.0f;
         float moon_speed = 0.02f;
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
-              * Matrix_Translate(raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
+              * Matrix_Translate(-raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
               * Matrix_Scale(lua_escala, lua_escala, lua_escala);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, MOON);
@@ -628,12 +626,19 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_light_source_uniform , 1 , GL_FALSE , glm::value_ptr(light_source));
 
 
+        
+        // printf("bezier: %f", beziert);        
+        glm::vec4 bezier_p1 = glm::vec4(0.0f,0.0f,0.0f,1.0f);
+        glm::vec4 bezier_p2 = glm::vec4(0.0f,0.0f,0.0f,1.0f);
+        glm::vec4 bezier_p3 = glm::vec4(0.0f,0.0f,0.0f,1.0f);
+        glm::vec4 bezier_p4 = glm::vec4(0.0f,0.0f,0.0f,1.0f);   
+
         // if(beziert < 1.0f){
         //     beziert += delta_t * 0.2f;
         // } else{
         //     beziert = 0.0f;
         // }
-        int bezier_speed = 1.0f;
+        float bezier_speed = 1.0f;
         if(beziert < 1.0f && !way_back)
             beziert += delta_t * bezier_speed;
         else{
@@ -645,13 +650,37 @@ int main(int argc, char* argv[])
             }
         }
 
-        // printf("bezier: %f", beziert);
-        glm::vec4 bezier_p1 = glm::vec4(1.0f,0.0f,0.0f,1.0f);
-        glm::vec4 bezier_p2 = glm::vec4(1.0f,0.0f,5.0f,1.0f);
-        glm::vec4 bezier_p3 = glm::vec4(-1.0f,0.0f,-5.0f,1.0f);
-        glm::vec4 bezier_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);        
+        float bezier_speed2 = 0.05f;
+        if(beziert_2 < 1.0f && !way_back2)
+            beziert_2 += delta_t * bezier_speed2;
+        else{
+            way_back2 = true;
+            beziert_2 -= delta_t * bezier_speed2;
+            if(beziert_2<=0 && way_back2){
+                way_back2 = false;
+                beziert_2 = 0;
+            }
+        }
+
+        bezier_p1 = glm::vec4(0.0f,1.0f,50.0f,1.0f);
+        bezier_p2 = glm::vec4(50.0f,1.0f,50.0f,1.0f);
+        bezier_p3 = glm::vec4(50.0f,1.0f,-50.0f,1.0f);
+        bezier_p4 = glm::vec4(0.0f,1.0f,-50.0f,1.0f); 
+        glm::vec4 bezier_c;
+
+        bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert_2);
+        
        
-        glm::vec4 bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert);
+       
+
+        model = Matrix_Translate(bezier_c.x , bezier_c.y + 1, bezier_c.z)
+              * Matrix_Scale(3.0f,3.0f,3.0f)
+              * Matrix_Rotate_X(-beziert_2 * 20)
+              * Matrix_Rotate_Z(-beziert_2 * 20);
+        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, SPHERE);
+        DrawVirtualObject("the_sphere");
+
         spin += delta_t;
         rasterization_type = 1;
         glUniform1i(g_rasterization_type_uniform, rasterization_type);
@@ -677,6 +706,8 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SPHERE);
         DrawVirtualObject("the_sphere");
+
+
 
         
         int smash_speed = 10;
@@ -714,6 +745,12 @@ int main(int argc, char* argv[])
             }
         }
 
+        bezier_p1 = glm::vec4(1.0f,0.0f,0.0f,1.0f);
+        bezier_p2 = glm::vec4(1.0f,0.0f,5.0f,1.0f);
+        bezier_p3 = glm::vec4(-1.0f,0.0f,-5.0f,1.0f);
+        bezier_p4 = glm::vec4(-1.0f,0.0f,-0.0f,1.0f);  
+
+        bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert);
              // Desenhamos o modelo do inimigo
         for(int i = 0; i < 2; i++){
             for(int l = 0; l < 2; l++){
