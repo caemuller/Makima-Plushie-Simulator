@@ -50,7 +50,7 @@ Animações, instancias de objetos, mapeamento de texturas entre outras implemen
 - Transformações geométricas controlada pelo usuário: o jogo se baseia em SMASH(amaçar) os inimigos, sendo eles os gnomos.
 - Câmera livre e câmera look-at: O jogo inicia com a camera livre, e ao apertar V pode-se alternar entre esta e a look-at.
 - Instâncias de objetos: variados objetos instânciados.
-- Três tipos de testes de intersecção: (Dot-Dot, Dot-Box, Box-Box)
+- Três tipos de testes de intersecção: (Point-Point, Point-Box, Box-Box)
 - Modelos de Iluminação Difusa e Blinn-Phong: estando ambos presentes nos dois modelos de interpolação podem ser observados em todos objetos, embora com diferentes K's.
 - Modelos de Interpolação de Phong e Gouraud: Todos objetos utilizam a interpolação de phong com excessão de uma esfera utilizada para demonstrar a de gourad ao lado de sua cópia com a de phong, pois é um método de iluminação  "pior", e não tinha porque usá-la no trabalho, sendo uma das duas esferas rotacionando.
 - Mapeamento de texturas em todos os objetos: Todos objetos possuem textura, com "excessão" do crosshair que não é uum objeto, sendo apenas colorido.
@@ -79,3 +79,14 @@ Foi usado a ferramenta Github Copilot em grande parte do trabalho para acelerar
 partes que requerem grande esforco manual.
 
 O uso do ChatGPT ocorreu apenas uma vez para o crosshair (nao foi util no geral)
+
+## Images
+
+This game was inspired by our goddess
+![Makima](pictures/makima-egg.jpg)
+
+1st screenshot of the game
+![Screenshot 1](pictures/print_jogo1.png)
+
+2nd screenshot of the game
+![Screenshot 2](pictures/print_jogo2.png)

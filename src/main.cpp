@@ -195,6 +195,7 @@ struct SceneObject
     glm::vec3    bbox_max;
 };
 
+// struct para guardar informações sobre os inimigos
 struct Enemy_type{
     bool smash;
     int id;
@@ -203,6 +204,7 @@ struct Enemy_type{
     glm::vec3 bbox_max;
 };
 
+// struct para guardar informações sobre os objetos
 struct Object_type{
     bool collision;
     int id;
@@ -210,6 +212,7 @@ struct Object_type{
     glm::vec3 bbox_max;
 };
 
+// struct para guardar informações sobr innimigos e objetos
 std::vector<Enemy_type> enemy_vector;
 std::vector<Object_type> object_vector;
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
@@ -432,6 +435,7 @@ int main(int argc, char* argv[])
     bool way_back_bola = false;
     float spin = 0;
     int count_enemies=0;
+    // cam starting position 
     glm::vec3 makima_bbox_min = g_VirtualScene["makima_plushie"].bbox_min;
     glm::vec3 makima_bbox_max = g_VirtualScene["makima_plushie"].bbox_max;
     glm::mat4 last_bola_model;
@@ -573,7 +577,7 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, SKYSPHERE);
 
-       
+       // creates sky sphere in the infinite
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         DrawVirtualObject("the_sphere");
@@ -632,6 +636,7 @@ int main(int argc, char* argv[])
         float raio_lua = abs(farplane) - 5;
         float lua_escala = 5.0f;
         float moon_speed = 0.01f;
+        //Creating matrix for moon and its rotations
         model = Matrix_Translate(camera_position_c.x,camera_position_c.y,camera_position_c.z)
             * Matrix_Translate(-raio_lua * cos((float)glfwGetTime() * moon_speed),raio_lua * sin((float)glfwGetTime() * moon_speed),0.0f)
             * Matrix_Rotate_Y(spin/3)    
@@ -659,6 +664,8 @@ int main(int argc, char* argv[])
         // } else{
         //     beziert = 0.0f;
         // }
+
+        //Bezier function 
         float bezier_speed = 1.0f;
         if(beziert < 1.0f && !way_back)
             beziert += delta_t * bezier_speed;
@@ -670,6 +677,7 @@ int main(int argc, char* argv[])
                 beziert = 0;
             }
         }
+
 
         float bezier_speed2 = 0.05f;
         if(beziert_2 < 1.0f && !way_back2)
@@ -694,7 +702,7 @@ int main(int argc, char* argv[])
                 beziert_bola = 0;
             }
         }
-
+        //bezier points
         bezier_p1 = glm::vec4(0.0f,1.0f,50.0f,1.0f);
         bezier_p2 = glm::vec4(50.0f,1.0f,50.0f,1.0f);
         bezier_p3 = glm::vec4(50.0f,1.0f,-50.0f,1.0f);
@@ -703,6 +711,7 @@ int main(int argc, char* argv[])
 
         bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert_bola);
 
+        // Desenhamos o modelo da esfera
         model = Matrix_Translate(bezier_c.x , bezier_c.y + 1, bezier_c.z)
               * Matrix_Rotate_X(-beziert_bola * 20)
               * Matrix_Rotate_Y(-beziert_bola )
@@ -711,6 +720,7 @@ int main(int argc, char* argv[])
             Object_type object_ins;
             object_ins.id = count_objects;
             object_ins.collision = false;
+            //salvamos o modelo da bola para colisão
             object_ins.bbox_min = g_VirtualScene["the_sphere"].bbox_min * glm::vec3(3.0f,3.0f/smash_y,3.0f);
             object_ins.bbox_max = g_VirtualScene["the_sphere"].bbox_max * glm::vec3(3.0f,3.0f/smash_y,3.0f);
             object_ins.bbox_max = object_ins.bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
@@ -719,6 +729,7 @@ int main(int argc, char* argv[])
 
             
             // object_ins.id = count_objects;
+            //Calculamos as colisoes
             if (!BoxCollision(makima_bbox_min, makima_bbox_max, object_ins.bbox_min, object_ins.bbox_max)){
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, SPHERE);
@@ -818,6 +829,7 @@ int main(int argc, char* argv[])
         int smash_speed = 10;
         
         //fim smash
+        //G reseta tudo
         if(toggle_G){
             // smash = false;
             // smash_y = 1.0f;         
@@ -835,6 +847,7 @@ int main(int argc, char* argv[])
          for(int i = 0; i < 3; i++){
             for(int l = 0; l < 3; l++){
                 srand(i+l*10);
+                //criamos as trees de uma maneira pseudoaleatoria
                 float rnn = (rand()%2 + 1);
                 float tree_scale = rand()%3 + 2;
                 model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0))
@@ -851,7 +864,7 @@ int main(int argc, char* argv[])
                 object_ins.bbox_max = g_VirtualScene["the_sphere"].bbox_max * glm::vec3(0.5f *tree_scale +rnn/3, tree_scale* 0.5f, 0.5f *tree_scale+rnn/3);
                 object_ins.bbox_max = object_ins.bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
                 object_ins.bbox_min = object_ins.bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
-
+                //tree's collision
                 if(!BoxCollision(makima_bbox_min, makima_bbox_max, object_ins.bbox_min,object_ins.bbox_max)){                        
                     glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                     glUniform1i(g_object_id_uniform, TREEBARK);
@@ -903,7 +916,7 @@ int main(int argc, char* argv[])
                 // enemy_ins.collision = true;
                 
                // enemy_ins.id = count_objects;
-               
+               //Implementamos o Death Touch
                 glm::vec3 aim = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z) + glm::vec3(camera_view_vector.x, camera_view_vector.y, camera_view_vector.z);
                 glm::vec3 pos = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z);
                 if(BoxCollision(makima_bbox_min, makima_bbox_max, enemy_vector.at(count_enemies).bbox_min, enemy_vector.at(count_enemies).bbox_max) && toggle_E){
@@ -946,7 +959,7 @@ int main(int argc, char* argv[])
         bezier_p2 = glm::vec4(0.0f,0.0f,20.0f,1.0f);
         bezier_p3 = glm::vec4(0.0f,0.0f,-20.0f,1.0f);
         bezier_p4 = glm::vec4(-20.0f,0.0f,-0.0f,1.0f);  
-
+        //Implementamos o Bailarino
         bezier_c = bezier_cubic_curve(bezier_p1, bezier_p2, bezier_p3, bezier_p4, beziert_2);
 
         model = Matrix_Translate( -30 + bezier_c.x,-1.0f ,  bezier_c.z + -30 ) 

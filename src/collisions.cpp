@@ -1,3 +1,5 @@
+
+// returns max of 3 numbers
 float max3(float v1, float v2, float v3){
     if(v1 < 0)
         v1 = -v1;
@@ -18,7 +20,7 @@ float max3(float v1, float v2, float v3){
         return v3;
     }
 }
-
+// collision test between box and box
 bool BoxCollision(const glm::vec3 bbox1min, const glm::vec3 bbox1max, const glm::vec3 bbox2min, const glm::vec3 bbox2max) {
 
     bool collisionX = bbox1max.x >= bbox2min.x && bbox2max.x >= bbox1min.x;
@@ -44,6 +46,7 @@ bool CheckSphereCollision(const glm::vec3 centroeu, const glm::vec3 centroobj, c
     }
 }
 
+// collision test between cillinder and cillinder
 bool CheckCillinderCollision(const glm::vec3 bbox1min, const glm::vec3 bbox1max, const glm::vec3 bbox2min, const glm::vec3 bbox2max) {
     float meanx1 = (bbox1min.x + bbox1max.x)/2;
     float meany1 = (bbox1min.y + bbox1max.y)/2;
@@ -71,6 +74,7 @@ bool CheckCillinderCollision(const glm::vec3 bbox1min, const glm::vec3 bbox1max,
     }
 }
 
+// collision test between cillinder and tree
 bool CheckCillinderCollisionTree(const glm::vec3 bbox1min, const glm::vec3 bbox1max, const glm::vec3 center_tree, const float radius_tree) {
     float meanx1 = (bbox1min.x + bbox1max.x)/2;
     float meany1 = (bbox1min.y + bbox1max.y)/2;
@@ -91,6 +95,7 @@ bool CheckCillinderCollisionTree(const glm::vec3 bbox1min, const glm::vec3 bbox1
     }
 }
 
+// collision test between dot and box
 bool CheckDotBox(const glm::vec3 dot, const glm::vec3 bboxmin, const glm::vec3 bboxmax) {
     bool condition1 = dot.x >= bboxmin.x && dot.x <= bboxmax.x;
     bool condition2 = dot.y >= bboxmin.y && dot.y <= bboxmax.y;
@@ -104,6 +109,7 @@ bool CheckDotBox(const glm::vec3 dot, const glm::vec3 bboxmin, const glm::vec3 b
     }
 }
 
+// collision test between dots
 bool CheckDotDot(const glm::vec3 dot1, const glm::vec3 dot2, const float radius1, const float radius2) {
     bool condition1 = (dot1.x - dot2.x) <= (radius1 + radius2);
     bool condition2 = (dot1.y - dot2.y) <= (radius1 + radius2);
