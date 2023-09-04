@@ -907,7 +907,6 @@ int main(int argc, char* argv[])
                 glm::vec3 aim = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z) + glm::vec3(camera_view_vector.x, camera_view_vector.y, camera_view_vector.z);
                 glm::vec3 pos = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z);
                 if(BoxCollision(makima_bbox_min, makima_bbox_max, enemy_vector.at(count_enemies).bbox_min, enemy_vector.at(count_enemies).bbox_max) && toggle_E){
-                    printf("HIT DAT GNOME");
                     enemy_vector.at(count_enemies).smash = true;
                     // toggle_E = !toggle_E;
                 }
@@ -969,7 +968,10 @@ int main(int argc, char* argv[])
 
             
             // object_ins2.id = count_objects;
-            if (!BoxCollision(makima_bbox_min, makima_bbox_max, object_ins2.bbox_min, object_ins2.bbox_max)){
+            // if (!BoxCollision(makima_bbox_min, makima_bbox_max, object_ins2.bbox_min, object_ins2.bbox_max)){
+            glm::vec3 campos2s = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z);
+            glm::vec3 bailarino_mid = glm::vec3(object_ins2.bbox_min.x, object_ins2.bbox_min.y+0.8, object_ins2.bbox_min.z);
+            if(!CheckDotDot(campos2s, bailarino_mid, 3.0f, 2.0f)){
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, GNOME);
                 DrawVirtualObject("garden_gnome");
@@ -977,11 +979,9 @@ int main(int argc, char* argv[])
             }
             //bailarino
             else{
-                model = last_bailarino_model;
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, GNOME);
                 DrawVirtualObject("garden_gnome");
-                printf("COllision happening with tree");
                 way_back = !way_back;
                 glm::vec4 aux = glm::vec4(camera_view_vector.x*0.01, 0, camera_view_vector.z*0.01, 0.0f);
                 camera_position_c = last_cam_pos - aux;
