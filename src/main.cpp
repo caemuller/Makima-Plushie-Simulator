@@ -975,7 +975,7 @@ int main(int argc, char* argv[])
                 DrawVirtualObject("garden_gnome");
                 object_ins2.collision = false;
             }
-            
+            //bailarino
             else{
                 model = last_bailarino_model;
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
