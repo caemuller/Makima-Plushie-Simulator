@@ -730,7 +730,6 @@ int main(int argc, char* argv[])
                 glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, SPHERE);
                 DrawVirtualObject("the_sphere");
-                printf("COllision happening with tree");
                 way_back_bola = !way_back_bola;
             }
 
@@ -754,7 +753,8 @@ int main(int argc, char* argv[])
         object_ins.bbox_min = object_ins.bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
         object_vector.insert(object_vector.begin() + count_objects, object_ins);
 
-        if(!BoxCollision(makima_bbox_min, makima_bbox_max, object_ins.bbox_min, object_ins.bbox_max)){
+        glm::vec3 cam_aux_dot = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z);
+        if(!CheckDotBox(cam_aux_dot, object_ins.bbox_min, object_ins.bbox_max)){
             glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(g_object_id_uniform, SPHERE);
             DrawVirtualObject("the_sphere");
@@ -780,14 +780,32 @@ int main(int argc, char* argv[])
         model = Matrix_Translate(-20,2,-4)
               * Matrix_Scale(3.0f,3.0f,3.0f)
               * Matrix_Rotate_X(spin);
-        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, SPHERE);
-        DrawVirtualObject("the_sphere");
-        // if (not collision)
+    
+
+        object_ins.id = count_objects;
         object_ins.collision = false;
-        //else
-        // object_ins.collision = true;
+        object_ins.bbox_min = g_VirtualScene["the_sphere"].bbox_min * glm::vec3(3.0f,3.0f,3.0f);
+        object_ins.bbox_max = g_VirtualScene["the_sphere"].bbox_max * glm::vec3(3.0f,3.0f,3.0f);
+        object_ins.bbox_max = object_ins.bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
+        object_ins.bbox_min = object_ins.bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
         object_vector.insert(object_vector.begin() + count_objects, object_ins);
+
+        cam_aux_dot = glm::vec3(camera_position_c.x, camera_position_c.y, camera_position_c.z);
+        if(!CheckDotBox(cam_aux_dot, object_ins.bbox_min, object_ins.bbox_max)){
+            glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(g_object_id_uniform, SPHERE);
+            DrawVirtualObject("the_sphere");
+        }
+        else{
+            glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(g_object_id_uniform, SPHERE);
+            DrawVirtualObject("the_sphere");
+            object_ins.collision = false;
+            glm::vec4 aux = glm::vec4(camera_view_vector.x*0.01, 0, camera_view_vector.z*0.01, 0.0f);
+            camera_position_c = last_cam_pos - aux;
+            camera_position_c.y = last_cam_pos.y;
+        }
+
         count_objects++;
 
 

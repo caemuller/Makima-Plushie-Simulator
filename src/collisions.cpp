@@ -91,6 +91,32 @@ bool CheckCillinderCollisionTree(const glm::vec3 bbox1min, const glm::vec3 bbox1
     }
 }
 
+bool CheckDotBox(const glm::vec3 dot, const glm::vec3 bboxmin, const glm::vec3 bboxmax) {
+    bool condition1 = dot.x >= bboxmin.x && dot.x <= bboxmax.x;
+    bool condition2 = dot.y >= bboxmin.y && dot.y <= bboxmax.y;
+    bool condition3 = dot.z >= bboxmin.z && dot.z <= bboxmax.z;
+
+    if(condition1 && condition2 && condition3){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool CheckDotDot(const glm::vec3 dot1, const glm::vec3 dot2, const float radius1, const float radius2) {
+    bool condition1 = (dot1.x - dot2.x) <= (radius1 + radius2);
+    bool condition2 = (dot1.y - dot2.y) <= (radius1 + radius2);
+    bool condition3 = (dot1.z - dot2.z) <= (radius1 + radius2);
+
+    if(condition1 && condition2 && condition3){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
 // bool spherical_collision(glm::vec3 pos1, glm::vec3 pos2, float r1, float r2){
 //     if(norm(pos1 - pos2) <= (r1 + r2)){
 //         return true;
