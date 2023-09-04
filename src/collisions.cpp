@@ -1,4 +1,3 @@
-
 float max3(float v1, float v2, float v3){
     if(v1 < 0)
         v1 = -v1;
