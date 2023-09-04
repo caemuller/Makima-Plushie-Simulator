@@ -435,6 +435,7 @@ int main(int argc, char* argv[])
     glm::vec3 makima_bbox_min = g_VirtualScene["makima_plushie"].bbox_min;
     glm::vec3 makima_bbox_max = g_VirtualScene["makima_plushie"].bbox_max;
     glm::mat4 last_bola_model;
+    glm::mat4 last_bailarino_model;
 
     //iniloop
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
@@ -736,6 +737,9 @@ int main(int argc, char* argv[])
                 DrawVirtualObject("the_sphere");
                 printf("COllision happening with tree");
                 way_back_bola = !way_back_bola;
+                glm::vec4 aux = glm::vec4(camera_view_vector.x*0.01, 0, camera_view_vector.z*0.01, 0.0f);
+                camera_position_c = last_cam_pos - aux;
+                camera_position_c.y = last_cam_pos.y;
             }
         last_bola_model = model;
         spin += delta_t;
@@ -804,12 +808,36 @@ int main(int argc, char* argv[])
                 float tree_scale = rand()%3 + 2;
                 model = Matrix_Translate(((l*15) - 10.0),-1.1f ,((i*15) - 10.0))
                       * Matrix_Scale(0.5f *tree_scale +rnn/3, tree_scale* 0.5f, 0.5f *tree_scale+rnn/3); 
+                Object_type object_ins;
+                object_ins.id = count_objects;
+                // if (not collision)
+                object_ins.collision = false;
+                //else
+                // object_ins.collision = true;
+                object_vector.insert(object_vector.begin() + count_objects, object_ins);
+                count_objects++;
+                object_ins.bbox_min = g_VirtualScene["the_sphere"].bbox_min * glm::vec3(0.5f *tree_scale +rnn/3, tree_scale* 0.5f, 0.5f *tree_scale+rnn/3);
+                object_ins.bbox_max = g_VirtualScene["the_sphere"].bbox_max * glm::vec3(0.5f *tree_scale +rnn/3, tree_scale* 0.5f, 0.5f *tree_scale+rnn/3);
+                object_ins.bbox_max = object_ins.bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
+                object_ins.bbox_min = object_ins.bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
 
-                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-                glUniform1i(g_object_id_uniform, TREEBARK);
-                DrawVirtualObject("tree_bark");
-                glUniform1i(g_object_id_uniform, TREELEAF);
-                DrawVirtualObject("tree_leaf");
+                if(!BoxCollision(makima_bbox_min, makima_bbox_max, object_ins.bbox_min,object_ins.bbox_max)){                        
+                    glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                    glUniform1i(g_object_id_uniform, TREEBARK);
+                    DrawVirtualObject("tree_bark");
+                    glUniform1i(g_object_id_uniform, TREELEAF);
+                    DrawVirtualObject("tree_leaf");
+                }
+                else{
+                    glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                    glUniform1i(g_object_id_uniform, TREEBARK);
+                    DrawVirtualObject("tree_bark");
+                    glUniform1i(g_object_id_uniform, TREELEAF);
+                    DrawVirtualObject("tree_leaf");
+                    glm::vec4 aux = glm::vec4(camera_view_vector.x*0.01, 0, camera_view_vector.z*0.01, 0.0f);
+                    camera_position_c = last_cam_pos - aux;
+                    camera_position_c.y = last_cam_pos.y;
+                }
                 
 
                 object_ins.collision = false;
@@ -895,17 +923,49 @@ int main(int argc, char* argv[])
              * Matrix_Rotate_Y(spin * 10)
               * Matrix_Scale(5.0f,5.0f/smash_y,5.0f); 
 
+            Object_type object_ins2;
+            object_ins2.id = count_objects;
+            // if (not collision)
+            object_ins2.collision = false;
+            //else
+            // object_ins2.collision = true;
+            object_vector.insert(object_vector.begin() + count_objects, object_ins2);
+            count_objects++;
+            object_ins2.bbox_min = g_VirtualScene["garden_gnome"].bbox_min * glm::vec3(5.0f,5.0f/smash_y,5.0f);
+            object_ins2.bbox_max = g_VirtualScene["garden_gnome"].bbox_max * glm::vec3(5.0f,5.0f/smash_y,5.0f);
+            object_ins2.bbox_max = object_ins2.bbox_max + glm::vec3(model[3][0], model[3][1], model[3][2]);
+            object_ins2.bbox_min = object_ins2.bbox_min + glm::vec3(model[3][0], model[3][1], model[3][2]);
+
+            
+            // object_ins2.id = count_objects;
+            if (!BoxCollision(makima_bbox_min, makima_bbox_max, object_ins2.bbox_min, object_ins2.bbox_max)){
+                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(g_object_id_uniform, GNOME);
+                DrawVirtualObject("garden_gnome");
+                object_ins2.collision = false;
+            }
+            
+            else{
+                model = last_bailarino_model;
+                glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(g_object_id_uniform, GNOME);
+                DrawVirtualObject("garden_gnome");
+                printf("COllision happening with tree");
+                way_back = !way_back;
+                glm::vec4 aux = glm::vec4(camera_view_vector.x*0.01, 0, camera_view_vector.z*0.01, 0.0f);
+                camera_position_c = last_cam_pos - aux;
+                camera_position_c.y = last_cam_pos.y;
+            }
+        last_bailarino_model = model;
              
         
-        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, GNOME);
-        DrawVirtualObject("garden_gnome");
-        object_ins.id = count_objects;
+        
+        object_ins2.id = count_objects;
         // if (not collision)
-        object_ins.collision = false;
+        object_ins2.collision = false;
         //else
         // object_ins.collision = true;
-        object_vector.insert(object_vector.begin() + count_objects, object_ins);
+        object_vector.insert(object_vector.begin() + count_objects, object_ins2);
         count_objects++;
 
 
