@@ -1,6 +1,42 @@
 # :heart: Makima Plushie Simulator :heart:
 Repo for our project :heart:
 
+## How to run
+### Windows
+If you have windows you must have openGL installed and compile it
+Using whatever you like, we suggest the use of [Code Blocks](https://www.codeblocks.org)
+
+### Linux
+In case you are using Linux (Debian Based) you must run the following commands
+before compiling the game
+
+` sudo apt-get install build-essential make libx11-dev libxrandr-dev \
+                         libxinerama-dev libxcursor-dev libxcb1-dev libxext-dev \
+                         libxrender-dev libxfixes-dev libxau-dev libxdmcp-dev \
+                         libmesa-dev libxxf86vm-dev `
+
+and now install OpenGL with
+
+`sudo apt install freeglut3-dev`
+
+then you can just run the game with
+
+`make run`
+
+
+## Images
+
+This game was inspired by our goddess
+![Makima](pictures/makima-egg.jpg)
+
+1st screenshot of the game
+![Screenshot 1](pictures/print_jogo1.png)
+
+2nd screenshot of the game
+![Screenshot 2](pictures/print_jogo2.png)
+
+
+## FCG
 -----------------------------------------------------
 | Critérios Técnicos                                  
 |-----------------------------------------------------
@@ -57,17 +93,17 @@ Animações, instancias de objetos, mapeamento de texturas entre outras implemen
 - Movimentação com curva Bézier cúbica: não pensamos no que utilizar, talvez nos gnomos, mas tem uma bola rotacionando que circula a floresta em um arco com o método.
 - Animações baseadas no tempo ($\Delta t$): todas animações, são abaseadas no tempo, incluindo a movimentação com a curva de bezier, a movimentação da camera, a movimentação da lua, a skysphere(skybox). Se alguma faltou, provavelmente também é.
 
-## Manual do Makima plushie simulator(MAKIMA SMASH):
-Interações:
-- W,S,A,D: utilizados para movimentação do personagem(camera).
-- E: SMASH. (modo ataque + DEATH TOUCH)
-- 1: Habilita/Desabilita o crosshair.
-- V: Trocar entre camera look-at e free-view.
-- P, O: trocam entre as projeções(herança do laboratório, e buga a skysphere).
+## Makima Plushie Simulator Manual (MAKIMA SMASH):
+### Interactions:
 
+W, S, A, D: Used for character (camera) movement.
+E: SMASH. (attack mode + DEATH TOUCH)
+1: Enable/Disable the crosshair.
+V: Switch between camera look-at and free-view.
+P, O: Switch between the projections (a legacy from the lab, and it glitches the skysphere).
 
-## Jogo:
-O objetivo do jogo eh AMASSAR os gnomos. Acompanhado de uma ambientação ABSURDA. E com umas bolinhas amigas
+## Game:
+The objective of the game is to CRUSH the gnomes. Accompanied by an ABSURD environment. And with some friendly little balls.
 
 ## Como Executar
 Em um terminal basta rodar o comando 
@@ -79,14 +115,3 @@ Foi usado a ferramenta Github Copilot em grande parte do trabalho para acelerar
 partes que requerem grande esforco manual.
 
 O uso do ChatGPT ocorreu apenas uma vez para o crosshair (nao foi util no geral)
-
-## Images
-
-This game was inspired by our goddess
-![Makima](pictures/makima-egg.jpg)
-
-1st screenshot of the game
-![Screenshot 1](pictures/print_jogo1.png)
-
-2nd screenshot of the game
-![Screenshot 2](pictures/print_jogo2.png)
