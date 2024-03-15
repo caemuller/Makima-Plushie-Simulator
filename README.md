@@ -48,14 +48,3 @@ P, O: Switch between the projections (a legacy from the lab, and it glitches the
 
 ## Game:
 The objective of the game is to CRUSH the gnomes. Accompanied by an ABSURD environment. And with some friendly little balls.
-
-## Como Executar
-Em um terminal basta rodar o comando 
-
-make run
-
-## Uso de LLMs
-Foi usado a ferramenta Github Copilot em grande parte do trabalho para acelerar
-partes que requerem grande esforco manual.
-
-O uso do ChatGPT ocorreu apenas uma vez para o crosshair (nao foi util no geral)
