@@ -47,4 +47,4 @@ V: Switch between camera look-at and free-view.
 P, O: Switch between the projections (a legacy from the lab, and it glitches the skysphere).
 
 ## Game:
-The objective of the game is to CRUSH the gnomes. Accompanied by an ABSURD environment. And with some friendly little balls.
+The objective of the game is to SMASH the gnomes. Accompanied by an ABSURD environment. And with some friendly little balls.
